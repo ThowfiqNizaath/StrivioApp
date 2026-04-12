@@ -1,0 +1,233 @@
+import { createContext, useContext, useEffect, useState } from "react";
+import api from "../../Files/axios";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
+
+const AuthContext = createContext(null);
+
+export const AuthProvider = ({ children }) => {
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  // const [todoEntry, setTodoEntry] = useState();
+  const [categories, setCategories] = useState([]);
+  const [routines, setRoutines] = useState([]);
+  const [activeRoutines, setActiveRoutines] = useState([]);
+  const navigate = useNavigate();
+  const [notes, setNotes] = useState([]);
+  const [showMenu, setShowMenu] = useState(false)
+  const {enqueueSnackbar} = useSnackbar()
+
+
+  // useEffect(() => console.log(loading), [loading])
+
+  // console.log(user)
+
+  useEffect(() => {
+    function initialLoad() {
+      setLoading(true)
+      setShowMenu(false)
+      if (user) {
+        getCategories();
+        getRoutines();
+        getNotes();
+        setTimeout(() => setLoading(false), 1000);
+      } else {
+        authUser();
+      }
+    }
+
+    initialLoad();
+  }, [user]);
+
+    useEffect(() => {
+      getActiveRoutines();
+    }, [routines]);
+
+  async function authUser(){
+    // console.log("authUser Fn")
+    try {
+      const response = await api.get("/register/user/");
+      if (response.data.success) {
+        setUser(response.data);
+        navigate("/protected/dashboard");
+      }
+    } catch (err) {
+      errorHandlerFn(err);
+    }
+  }
+
+  async function login(username_or_email, password) {
+    // console.log("Hi");
+    try {
+      const response = await api.post("/register/login/", {
+        username_or_email: username_or_email,
+        password: password,
+      });
+      if (response.data.success) {
+        enqueueSnackbar("Logged in successfully", { variant: "success" });
+        authUser();
+      }else{
+        enqueueSnackbar(response.data.message, { variant: "error" });
+      }
+    } catch (err) {
+      errorHandlerFn(err);
+    }
+  }
+
+  async function logout() {
+    try {
+      const response = await api.post("/register/logout/");
+      if (response.data.success) {
+        setUser(null);
+        enqueueSnackbar("Logged out successfully", { variant: "success" });
+        navigate("/login");
+      }
+    } catch (err) {
+      errorHandlerFn(err);
+    }
+  }
+
+  async function getCategories() {
+    try {
+      const response = await api.get("/api/categories/");
+      // console.log(response.data)
+      setCategories(response.data);
+    } catch (err) {
+      errorHandlerFn(err)
+    }
+  }
+
+  async function getRoutines() {
+    try {
+      const response = await api.get("/api/routine/");
+      // console.log(response.data)
+      setRoutines(response.data);
+    } catch (err) {
+      errorHandlerFn(err);
+    }
+  }
+
+  const getActiveRoutines = () => {
+    if(routines.length > 0){
+      setActiveRoutines(routines.filter((item) => item.active === true));
+    }
+  }
+    
+
+  async function getNotes() {
+    try{
+      const response = await api.get("/api/notes/")
+      setNotes(response.data)
+    }catch(err){
+      errorHandlerFn(err);
+    }
+  }
+
+  function isValidDate(date) {
+    return new Date().toISOString().split("T")[0] >= date;
+  }
+
+
+   async function getRoutineEntryByFrom(date) {
+     try {
+       if (isValidDate(date)) {
+         const response = await api.get(
+           `/api/routineEntry/?fromDate=${date}`,
+         );
+        //  console.log("Rutine Entry function", JSON.stringify(response.data, null,2));
+         return response.data || []
+       }
+     } catch (err) {
+       errorHandlerFn(err);
+     }
+   }
+
+   async function getRoutineEntryByFromTo(from, to){
+    try{
+      const response = await api.get(
+        `/api/routineEntry/?fromDate=${from}&toDate=${to}`,
+      );
+    return await response.data
+    }catch(err){
+      errorHandlerFn(err)
+    }
+   }
+
+   async function errorHandlerFn(err){
+    console.log(err.response)
+    if (err.response && err.response.status === 401) {
+      try {
+        // console.log("I'm refreshing Token");
+        const response = await api.post("/register/token/refresh/", {})
+        if(response.data.success){
+          await authUser()
+        }
+      } catch (err) {
+        console.log(err.response.data);
+        setUser(null)
+      }
+    }else{
+      if(err.response){
+        console.log(err.response)
+        enqueueSnackbar(
+          err.response.data.message || err.response.data.non_field_errors[0],
+          { variant: "error" },
+        );
+      }else{
+        console.log(err)
+      }
+    }
+   }
+
+
+
+   function convertTimeTo12Hrs(time24){
+
+    if(!time24) return "No Time" 
+
+    const [hour, minute, second] = time24.split(":");
+
+    const date = new Date();
+    date.setHours(hour, minute, second);
+
+    const time12 = date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    return time12
+   }
+
+
+  return (
+    <AuthContext.Provider
+      value={{
+        loading,
+        user,
+        login,
+        logout,
+        authUser,
+        categories,
+        setCategories,
+        getRoutines,
+        routines,
+        activeRoutines,
+        setActiveRoutines,
+        setRoutines,
+        notes,
+        setNotes,
+        getRoutineEntryByFrom,
+        getRoutineEntryByFromTo,
+        errorHandlerFn,
+        convertTimeTo12Hrs,
+        showMenu,
+        setShowMenu,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
