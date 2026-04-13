@@ -74,6 +74,7 @@ SIMPLE_JWT = {
 }
 
 ROOT_URLCONF = 'strivioBackend.urls'
+
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [

@@ -31,22 +31,25 @@ export const AuthProvider = ({ children }) => {
         getRoutines();
         getNotes();
         setTimeout(() => setLoading(false), 1000);
-      } else {
-        authUser();
-      }
+      } 
+      // else {
+      //   authUser();
+      // }
     }
 
     initialLoad();
   }, [user]);
 
     useEffect(() => {
-      getActiveRoutines();
+      if(user && routines.length > 0){
+        getActiveRoutines();
+      }
     }, [routines]);
 
   async function authUser(){
-    // console.log("authUser Fn")
     try {
       const response = await api.get("/register/user/");
+      console.log(response.data)
       if (response.data.success) {
         setUser(response.data);
         navigate("/protected/dashboard");
@@ -64,8 +67,9 @@ export const AuthProvider = ({ children }) => {
         password: password,
       });
       if (response.data.success) {
+         console.log(response.data);
         enqueueSnackbar("Logged in successfully", { variant: "success" });
-        authUser();
+        await authUser();
       }else{
         enqueueSnackbar(response.data.message, { variant: "error" });
       }
@@ -154,8 +158,8 @@ export const AuthProvider = ({ children }) => {
    }
 
    async function errorHandlerFn(err){
-    console.log(err.response)
-    if (err.response && err.response.status === 401) {
+    // console.log(err.response)
+    if (err.response && err.response.status === 401 && user) {
       try {
         // console.log("I'm refreshing Token");
         const response = await api.post("/register/token/refresh/", {})
@@ -170,7 +174,7 @@ export const AuthProvider = ({ children }) => {
       if(err.response){
         console.log(err.response)
         enqueueSnackbar(
-          err.response.data.message || err.response.data.non_field_errors[0],
+          err.response.data?.message || err.response.data?.non_field_errors ? err.response.data?.non_field_errors[0] :  "Something went wrong, try again later",
           { variant: "error" },
         );
       }else{
