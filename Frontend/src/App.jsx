@@ -29,6 +29,7 @@ const App = () => {
           <Route path="notes/:id" element={<NotePadId />} />
           <Route path="*" element={<NotFound />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
   );
