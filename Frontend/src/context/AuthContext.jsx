@@ -14,18 +14,17 @@ export const AuthProvider = ({ children }) => {
   const [activeRoutines, setActiveRoutines] = useState([]);
   const navigate = useNavigate();
   const [notes, setNotes] = useState([]);
-  const [showMenu, setShowMenu] = useState(false)
-  const {enqueueSnackbar} = useSnackbar()
-
+  const [showMenu, setShowMenu] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   // useEffect(() => console.log(loading), [loading])
 
   // console.log(user)
 
   useEffect(() => {
-    setShowMenu(false)
+    setShowMenu(false);
     authUser();
-  }, [])
+  }, []);
 
   useEffect(() => {
     function initialLoad() {
@@ -35,29 +34,30 @@ export const AuthProvider = ({ children }) => {
         getRoutines();
         getNotes();
         setTimeout(() => setLoading(false), 500);
-      } 
-       }
+      }
+    }
 
     initialLoad();
   }, [user]);
 
-    useEffect(() => {
-      if(user && routines.length > 0){
-        getActiveRoutines();
-      }
-    }, [routines]);
+  useEffect(() => {
+    if (user && routines.length > 0) {
+      getActiveRoutines();
+    }
+  }, [routines]);
 
-  async function authUser(){
+  async function authUser() {
     try {
       const response = await api.get("/register/user/");
-      console.log(response.data)
+      // console.log(response.data);
       if (response.data.success) {
         setUser(response.data);
         navigate("/protected/dashboard");
-        setLoading(false)
+        // setLoading(false);
       }
     } catch (err) {
       errorHandlerFn(err);
+      setLoading(false);
     }
   }
 
@@ -68,10 +68,10 @@ export const AuthProvider = ({ children }) => {
         password: password,
       });
       if (response.data.success) {
-         console.log(response.data);
+        console.log(response.data);
         enqueueSnackbar("Logged in successfully", { variant: "success" });
         await authUser();
-      }else{
+      } else {
         enqueueSnackbar(response.data.message, { variant: "error" });
       }
     } catch (err) {
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
       if (response.data.success) {
         setUser(null);
         enqueueSnackbar("Logged out successfully", { variant: "success" });
-       window.location.href = "/login";
+        navigate('/login')
       }
     } catch (err) {
       errorHandlerFn(err);
@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }) => {
       // console.log(response.data)
       setCategories(response.data);
     } catch (err) {
-      errorHandlerFn(err)
+      errorHandlerFn(err);
     }
   }
 
@@ -113,17 +113,16 @@ export const AuthProvider = ({ children }) => {
   }
 
   const getActiveRoutines = () => {
-    if(routines.length > 0){
+    if (routines.length > 0) {
       setActiveRoutines(routines.filter((item) => item.active === true));
     }
-  }
-    
+  };
 
   async function getNotes() {
-    try{
-      const response = await api.get("/api/notes/")
-      setNotes(response.data)
-    }catch(err){
+    try {
+      const response = await api.get("/api/notes/");
+      setNotes(response.data);
+    } catch (err) {
       errorHandlerFn(err);
     }
   }
@@ -132,63 +131,63 @@ export const AuthProvider = ({ children }) => {
     return new Date().toISOString().split("T")[0] >= date;
   }
 
-
-   async function getRoutineEntryByFrom(date) {
-     try {
-       if (isValidDate(date)) {
-         const response = await api.get(
-           `/api/routineEntry/?fromDate=${date}`,
-         );
+  async function getRoutineEntryByFrom(date) {
+    try {
+      if (isValidDate(date)) {
+        const response = await api.get(`/api/routineEntry/?fromDate=${date}`);
         //  console.log("Rutine Entry function", JSON.stringify(response.data, null,2));
-         return response.data || []
-       }
-     } catch (err) {
-       errorHandlerFn(err);
-     }
-   }
+        return response.data || [];
+      }
+    } catch (err) {
+      errorHandlerFn(err);
+    }
+  }
 
-   async function getRoutineEntryByFromTo(from, to){
-    try{
+  async function getRoutineEntryByFromTo(from, to) {
+    try {
       const response = await api.get(
         `/api/routineEntry/?fromDate=${from}&toDate=${to}`,
       );
-    return await response.data
-    }catch(err){
-      errorHandlerFn(err)
+      return await response.data;
+    } catch (err) {
+      errorHandlerFn(err);
     }
-   }
+  }
 
-   async function errorHandlerFn(err){
+  async function errorHandlerFn(err) {
     // console.log(err.response)
     if (err.response && err.response.status === 401 && user) {
       try {
         // console.log("I'm refreshing Token");
-        const response = await api.post("/register/token/refresh/", {})
-        if(response.data.success){
-          await authUser()
+        const response = await api.post("/register/token/refresh/", {});
+        if (response.data.success) {
+          await authUser();
         }
       } catch (err) {
-        console.log(err.response.data);
+        navigate("/login")
         setUser(null)
+        setLoading(false)
       }
-    }else{
-      if(err.response){
-        console.log(err.response)
+    } else if (err.response && err.response.status === 401 && !user) {
+      navigate("/login")
+      setLoading(false)
+    } else {
+      if (err.response) {
+        // console.log(err.response);
         enqueueSnackbar(
-          err.response.data?.message || err.response.data?.non_field_errors ? err.response.data?.non_field_errors[0] :  "Something went wrong, try again later",
+          err.response.data?.message || err.response.data?.non_field_errors
+            ? err.response.data?.non_field_errors[0]
+            : "Something went wrong, try again later",
           { variant: "error" },
         );
-      }else{
-        console.log(err)
+      } else {
+        console.log(err);
       }
     }
-   }
+  }
 
-
-
-   function convertTimeTo12Hrs(time24){
-
-    if(!time24) return "No Time" 
+  function convertTimeTo12Hrs(time24) {
+    if (!time24) return "No Time";
 
     const [hour, minute, second] = time24.split(":");
 
@@ -201,9 +200,8 @@ export const AuthProvider = ({ children }) => {
       hour12: true,
     });
 
-    return time12
-   }
-
+    return time12;
+  }
 
   return (
     <AuthContext.Provider
