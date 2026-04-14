@@ -8,7 +8,7 @@ import { Menu } from "lucide-react";
 export const ProtectedRouter = () => {
   const { user, authUser, showMenu, setShowMenu, loading} = useAuth();
 
-  if (!user) {
+  if (!user && !loading) {
     return <Navigate to="/login" />;
   }
 

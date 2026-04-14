@@ -138,9 +138,7 @@ const ToDo = () => {
                 if (isValidDate(e.target.value)) {
                   setCurrentDate(e.target.value);
                 } else {
-                  console.log({
-                    message: "Sorry, You can't upload for tomorror.",
-                  });
+                  enqueueSnackbar("Sorry, You can't upload for future.", {variant: "info"});
                 }
               }}
             />

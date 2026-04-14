@@ -23,19 +23,20 @@ export const AuthProvider = ({ children }) => {
   // console.log(user)
 
   useEffect(() => {
+    setShowMenu(false)
+    authUser();
+  }, [])
+
+  useEffect(() => {
     function initialLoad() {
-      setLoading(true)
-      setShowMenu(false)
       if (user) {
+        setLoading(true);
         getCategories();
         getRoutines();
         getNotes();
-        setTimeout(() => setLoading(false), 1000);
+        setTimeout(() => setLoading(false), 500);
       } 
-      // else {
-      //   authUser();
-      // }
-    }
+       }
 
     initialLoad();
   }, [user]);
@@ -53,6 +54,7 @@ export const AuthProvider = ({ children }) => {
       if (response.data.success) {
         setUser(response.data);
         navigate("/protected/dashboard");
+        setLoading(false)
       }
     } catch (err) {
       errorHandlerFn(err);
@@ -60,7 +62,6 @@ export const AuthProvider = ({ children }) => {
   }
 
   async function login(username_or_email, password) {
-    // console.log("Hi");
     try {
       const response = await api.post("/register/login/", {
         username_or_email: username_or_email,
@@ -84,7 +85,7 @@ export const AuthProvider = ({ children }) => {
       if (response.data.success) {
         setUser(null);
         enqueueSnackbar("Logged out successfully", { variant: "success" });
-        navigate("/login");
+       window.location.href = "/login";
       }
     } catch (err) {
       errorHandlerFn(err);

@@ -55,6 +55,7 @@ const NotePadId = () => {
       errorHandlerFn(err);
     }
   }
+
   return (
     <div className="shadow max-h-full h-full lg:w-[70%] xl:w-[60%] flex flex-col">
       {!notePadLoading ? (
@@ -70,7 +71,7 @@ const NotePadId = () => {
       )}
 
       <div className="m-4 absolute top-0 left-0">
-        <button onClick={() => navigate("/protected/notes")}>
+        <button onClick={() => navigate("/protected/notes")} className="cursor-pointer">
           <ArrowLeft className="w-6 h-6 md:w-8 md:h-8" />
         </button>
       </div>

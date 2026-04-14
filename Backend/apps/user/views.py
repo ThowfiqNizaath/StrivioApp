@@ -92,10 +92,22 @@ class LoginView(APIView):
         
 class LogoutView(APIView):
     def post(self, request):
-        response = Response({"success": True, "message": "Logged out"})
-        response.delete_cookie("access_token")
-        response.delete_cookie("refresh_token")
-        return response
+        def post(self, request):
+            response = Response({"success": True, "message": "Logged out"})
+
+            response.delete_cookie(
+                key="access_token",
+                path="/",
+                samesite="None",
+            )
+
+            response.delete_cookie(
+                key="refresh_token",
+                path="/",
+                samesite="None",
+            )
+
+            return response
         
         
 class UserAuthentication(APIView):
