@@ -65,15 +65,18 @@ class LoginView(APIView):
                     key = "access_token",
                     value = access,
                     httponly = True,
-                    samesite = "Lax",
-                    max_age=3600
+                    # samesite = "Lax",
+                    max_age=3600,
+                    secure=True,        # 🔥 REQUIRED
+                    samesite="None",
                     )
                 
                 response.set_cookie(
                     key="refresh_token",
                     value= str(refresh),
                     httponly=True,
-                    samesite="Lax",
+                    secure=True,        # 🔥 REQUIRED
+                    samesite="None",
                     max_age=7 * 24 * 3600
                     )
                 
@@ -128,7 +131,8 @@ class CookieTokenRefreshView(APIView):
                 key="access_token",
                 value=new_access,
                 httponly=True,
-                samesite="Lax",
+                secure=True,        # 🔥 REQUIRED
+                samesite="None",
                 max_age=3600
             )
             return response
