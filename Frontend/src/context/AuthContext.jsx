@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
     function initialLoad() {
       if (user) {
         setLoading(true);
+        setShowMenu(false);
         getCategories();
         getRoutines();
         getNotes();
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     if (user && routines.length > 0) {
       getActiveRoutines();
     }
-  }, [routines]);
+  }, [routines, categories]);
 
   async function authUser() {
     try {
@@ -71,6 +72,7 @@ export const AuthProvider = ({ children }) => {
         console.log(response.data);
         enqueueSnackbar("Logged in successfully", { variant: "success" });
         await authUser();
+        return response.data
       } else {
         enqueueSnackbar(response.data.message, { variant: "error" });
       }
@@ -85,7 +87,7 @@ export const AuthProvider = ({ children }) => {
       if (response.data.success) {
         setUser(null);
         enqueueSnackbar("Logged out successfully", { variant: "success" });
-        navigate('/login')
+        navigate("/login");
       }
     } catch (err) {
       errorHandlerFn(err);
@@ -164,22 +166,23 @@ export const AuthProvider = ({ children }) => {
           await authUser();
         }
       } catch (err) {
-        navigate("/login")
-        setUser(null)
-        setLoading(false)
+        navigate("/login");
+        setUser(null);
+        setLoading(false);
       }
     } else if (err.response && err.response.status === 401 && !user) {
-      navigate("/login")
-      setLoading(false)
+      navigate("/login");
+      setLoading(false);
     } else {
       if (err.response) {
-        // console.log(err.response);
-        enqueueSnackbar(
-          err.response.data?.message || err.response.data?.non_field_errors
-            ? err.response.data?.non_field_errors[0]
-            : "Something went wrong, try again later",
-          { variant: "error" },
-        );
+        console.log(err.response);
+        const errorMsg =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.response?.data?.detail ||
+          err.response?.data?.non_field_errors?.[0] ||
+          "Something went wrong, try again later";
+        enqueueSnackbar(errorMsg, { variant: "error" });
       } else {
         console.log(err);
       }
@@ -226,6 +229,7 @@ export const AuthProvider = ({ children }) => {
         convertTimeTo12Hrs,
         showMenu,
         setShowMenu,
+        getCategories,
       }}
     >
       {children}

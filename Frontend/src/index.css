@@ -32,3 +32,18 @@ ul[data-type="taskList"] li{
   display: flex;
   gap: 8px;
 }
+
+#d::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  cursor: pointer;
+} 
+
+#d::-webkit-inner-spin-button,
+#d::-webkit-clear-button {
+  display: none;
+}

@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
 import api from "../../Files/axios";
 import { useAuth } from "../context/AuthContext";
-import { ArrowBigRight, Calendar, Check, CircleChevronRight, LoaderCircle, Save } from "lucide-react";
+import {
+  ArrowBigRight,
+  Calendar,
+  Check,
+  CircleChevronRight,
+  LoaderCircle,
+  Save,
+} from "lucide-react";
 import { useSnackbar } from "notistack";
+import { Link } from "react-router-dom";
 
 const ToDo = () => {
   const [currentDate, setCurrentDate] = useState(
     new Date().toISOString().split("T")[0],
   );
   const [entries, setEntries] = useState([]);
-  const {
-    getRoutineEntryByFrom,
-    errorHandlerFn,
-    activeRoutines,
-  } = useAuth();
- 
+  const { getRoutineEntryByFrom, errorHandlerFn, activeRoutines } = useAuth();
+
   const [editId, setEditId] = useState(null);
   const [editChecked, setEditChecked] = useState(false);
   const [editnote, setEditNote] = useState("");
-  const {enqueueSnackbar} = useSnackbar()
-  const [todoLoading, setTodoLoading] = useState(true)
-  const [pending, setPending] = useState(false)
+  const { enqueueSnackbar } = useSnackbar();
+  const [todoLoading, setTodoLoading] = useState(true);
+  const [pending, setPending] = useState(false);
 
   function isValidDate(date) {
     return new Date().toISOString().split("T")[0] >= date;
@@ -38,20 +42,22 @@ const ToDo = () => {
       }
     } catch (err) {
       errorHandlerFn(err);
-    } finally{
-      setTodoLoading(false)
+    } finally {
+      setTodoLoading(false);
     }
   }
 
   function handleEdit(id, { completed, note }) {
-    setEditId(id);
-    setEditChecked(completed || false);
-    setEditNote(note || "");
+    if (!pending) {
+      setEditId(id);
+      setEditChecked(completed || false);
+      setEditNote(note || "");
+    }
   }
 
   async function handleSubmit(entryId) {
     try {
-      setPending(true)
+      setPending(true);
       if (entryId) {
         const response = await api.put(`/api/routineEntry/${entryId}/`, {
           date: currentDate,
@@ -75,7 +81,7 @@ const ToDo = () => {
     } catch (err) {
       errorHandlerFn(err);
     } finally {
-      setPending(false)
+      setPending(false);
       setEditId(null);
       setEditChecked(false);
       setEditNote("");
@@ -101,11 +107,19 @@ const ToDo = () => {
             <p className="">Date:</p>
             <p className="font-medium">{currentDate}</p>
           </div>
-          <div className="relative inline-block w-6 h-6">
-            <Calendar className="w-full h-full" />
+
+          {/* <div>
             <input
-              id="calenderTodo"
-              className="absolute inset-0 opacity-0 cursor-pointer z-50"
+              type="date"
+              id="d"
+            />
+          </div> */}
+
+          <div className="flex justify-center items-center">
+            {/* <Calendar className="w-full h-full cursor-pointer -z-10" /> */}
+            <input
+              id="d"
+              className="relative w-6 h-6 text-transparent bg-white cursor-pointer overflow-hidden"
               type="date"
               value={currentDate}
               onChange={(e) => {
@@ -137,10 +151,12 @@ const ToDo = () => {
                       value={editId === item.id ? editnote : entry?.note || ""}
                       placeholder="Note here..."
                       onChange={(e) => {
-                        if (item.id !== editId) {
-                          handleEdit(item.id, entry);
+                        if (!pending) {
+                          if (item.id !== editId) {
+                            handleEdit(item.id, entry);
+                          }
+                          setEditNote(e.target.value);
                         }
-                        setEditNote(e.target.value);
                       }}
                     />
                   </div>
@@ -150,15 +166,14 @@ const ToDo = () => {
                     <input
                       type="checkbox"
                       className="h-5 w-5 sm:h-6 sm:w-6 cursor-pointer"
-                      onChange={
-                        (e) => {
+                      onChange={(e) => {
+                        if (!pending) {
                           if (editId !== item.id) {
                             handleEdit(item.id, entry);
                           }
                           setEditChecked(e.target.checked);
                         }
-                        // handleEdit(item.id, e.target.checked, entry?.note || "")
-                      }
+                      }}
                       checked={
                         editId === item.id
                           ? editChecked
@@ -172,11 +187,13 @@ const ToDo = () => {
                         title="save"
                         type="button"
                         onClick={() => handleSubmit(entry?.id)}
-                        disabled = {pending}
+                        disabled={pending}
                       >
-                        {
-                          pending ? <LoaderCircle className="animate-spin duration-300 ease-in"/> : <Save className="text-gray-700 h-6 w-6" />
-                        }
+                        {pending ? (
+                          <LoaderCircle className="animate-spin duration-300 ease-in" />
+                        ) : (
+                          <Save className="text-gray-700 h-6 w-6" />
+                        )}
                       </button>
                     )}
                   </div>
@@ -190,7 +207,13 @@ const ToDo = () => {
           </div>
         ) : (
           <div className="my-10 font-semibold text-xl text-gray-500">
-            Add Routine First
+            No routines yet.{" "}
+            <Link
+              className="cursor-pointer text-blue-400 hover:text-blue-600"
+              to="/protected/routine"
+            >
+              Add one to get started!
+            </Link>{" "}
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import loginRightImg from "../assets/loginRightImg.jpg";
 import {useSnackbar} from "notistack"
+import { FastForward, LoaderCircle } from "lucide-react";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -15,6 +16,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { errorHandlerFn } = useAuth();
   const {enqueueSnackbar} = useSnackbar()
+  const [signuploading, setSignupLoading] = useState(false)
 
   useEffect(() => {
     doubleCheckPassword();
@@ -39,6 +41,7 @@ const SignUp = () => {
 
   async function signup(e) {
     e.preventDefault();
+    setSignupLoading(true)
     try {
       if (confirmPassword === password) {
         await api.post("/register/signup/", {
@@ -54,6 +57,8 @@ const SignUp = () => {
       }
     } catch (err) {
       errorHandlerFn(err);
+    }finally{
+      setSignupLoading(false)
     }
   }
 
@@ -142,9 +147,14 @@ const SignUp = () => {
 
             <button
               type="submit"
-              className="bg-gray-600 text-white w-full py-2 mt-10 rounded font-semibold cursor-pointer"
+              className="bg-gray-600 text-white w-full py-2 mt-10 rounded font-semibold cursor-pointer text-center flex justify-center items-center"
+              disabled={signuploading}
             >
-              SignUp
+              {signuploading ? (
+                <LoaderCircle className="animate-spin duration-300 ease-in" />
+              ) : (
+                "Sign Up"
+              )}
             </button>
 
             <div className="mt-5 flex gap-2 justify-center flex-wrap">

@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import api from "../../Files/axios";
 import { useAuth } from "../context/AuthContext";
-import { LoaderCircle, LoaderIcon, Plus, X } from "lucide-react";
+import { DeleteIcon, LoaderCircle, LoaderIcon, Plus, X } from "lucide-react";
 import { useSnackbar } from "notistack";
 
 const Category = () => {
   const [category, setCategory] = useState("");
-  const { categories, setCategories, errorHandlerFn } = useAuth();
+  const { categories, setCategories, errorHandlerFn, getRoutines } = useAuth();
   const [editId, setEditId] = useState(null);
   const [editValue, setEditValue] = useState("");
   const inputref = useRef(null);
@@ -35,25 +35,32 @@ const Category = () => {
   }
 
   async function deleteCategory(id) {
-    setDeleteId(id)
-    try {
-      const response = await api.delete(`/api/categories/${id}/`);
-      if (response.data.success) {
-        setCategories((prev) => prev.filter((cat) => cat.id != id));
-        enqueueSnackbar("Category deleted successfully", { variant: "success" });
+    if(deleteId === null){
+      setDeleteId(id);
+      try {
+        const response = await api.delete(`/api/categories/${id}/`);
+        if (response.data.success) {
+          setCategories((prev) => prev.filter((cat) => cat.id != id));
+          await getRoutines()
+          enqueueSnackbar("Category deleted successfully", {
+            variant: "success",
+          });
+        }
+      } catch (err) {
+        errorHandlerFn(err);
+      } finally {
+        setDeleteId(null);
       }
-    } catch (err) {
-      errorHandlerFn(err);
-    }finally{
-      setDeleteId(null)
     }
   }
 
   function editCategory({ id, value }) {
-    setEditId(id);
-    setEditValue(value);
+    if(!editCategoryPending){
+      setEditId(id);
+      setEditValue(value);
 
-    setTimeout(() => inputref.current.focus(), 0);
+      setTimeout(() => inputref.current.focus(), 0);
+    }
   }
 
   async function submitCategory() {
@@ -104,6 +111,7 @@ const Category = () => {
               className="border border-gray-500 rounded text-base md:text-lg px-4 py-0.5 cursor-pointer"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              required
             />
           </div>
 
@@ -145,22 +153,18 @@ const Category = () => {
                 className="outline-0 focus:border-b-2 focus:border-b-gray-400 cursor-pointer"
                 value={editId === cat.id ? editValue : cat.name}
                 onChange={(e) => {
-                  if (cat.id !== editId) {
-                    editCategory(cat);
+                  if(!editCategoryPending){
+                    if (cat.id !== editId) {
+                      editCategory(cat);
+                    }
+                    setEditValue(e.target.value);
                   }
-                  setEditValue(e.target.value);
                 }}
                 // disabled={cat.id !== editId}
                 ref={cat.id === editId ? inputref : null}
+                required
               />
               <div className="flex gap-4 sm:gap-6 items-center flex-wrap">
-                {/* {cat.id === editId ? (
-                
-              ) : (
-                <button onClick={() => editCategory(cat.id, cat.name)}>
-                  Edit
-                </button>
-              )} */}
 
                 {editId === cat.id && (
                   <>

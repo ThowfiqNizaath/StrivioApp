@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import api from "../../Files/axios";
 import { LoaderCircle, Plus, X } from "lucide-react";
 import { useSnackbar } from "notistack";
+import { Link } from "react-router-dom";
 
 const Routine = () => {
   const { categories, routines, setRoutines, errorHandlerFn } = useAuth();
@@ -54,27 +55,31 @@ const Routine = () => {
   }
 
   async function deleteRotine(id) {
-    setDeleteId(id)
-    try {
-      const response = await api.delete(`/api/routine/${id}/`);
-      enqueueSnackbar("Routine deleted successfully", { variant: "success" });
-      setRoutines((prev) => prev.filter((val) => val.id !== id));
-    } catch (err) {
-      errorHandlerFn(err);
-    } finally{
-      setDeleteId(null)
+    if (deleteId === null){
+      setDeleteId(id);
+      try {
+        const response = await api.delete(`/api/routine/${id}/`);
+        enqueueSnackbar("Routine deleted successfully", { variant: "success" });
+        setRoutines((prev) => prev.filter((val) => val.id !== id));
+      } catch (err) {
+        errorHandlerFn(err);
+      } finally {
+        setDeleteId(null);
+      }
     }
   }
 
   function handleEditRoutine({ id, category, name, active, scheduled_at }) {
-    setEditId(id);
-    setEditCategoryId(category);
-    setEditRoutine(name);
-    setEditActive(active);
-    setEditScheduleAt(scheduled_at);
+    if(!editRoutinePending){
+      setEditId(id);
+      setEditCategoryId(category);
+      setEditRoutine(name);
+      setEditActive(active);
+      setEditScheduleAt(scheduled_at);
 
-    if (inputref.current === null) {
-      setTimeout(() => inputref.current.focus(), 0);
+      if (inputref.current === null) {
+        setTimeout(() => inputref.current.focus(), 0);
+      }
     }
   }
 
@@ -160,6 +165,7 @@ const Routine = () => {
               value={routine}
               onChange={(e) => setRoutine(e.target.value)}
               placeholder="Gym, Walking......"
+              required
             />
           </div>
 
@@ -172,6 +178,7 @@ const Routine = () => {
               value={scheduledAt}
               className="shadow px-4 py-1 text-base md:text-lg cursor-pointer"
               onChange={(e) => setScheduledAt(e.target.value)}
+              required
             />
           </div>
 
@@ -217,15 +224,18 @@ const Routine = () => {
                 <input
                   className="outline-0 focus:border-b-gray-400 focus:border-b-2 p-1 cursor-pointer"
                   value={editId === item.id ? editRoutine : item.name}
+                  required
                   // disabled={editId !== item.id}
                   onChange={(e) => {
-                    if (editId !== item.id) {
-                      // First interaction → start editing this item
-                      handleEditRoutine(item);
-                    }
+                    if (!editRoutinePending) {
+                      if (editId !== item.id) {
+                        // First interaction → start editing this item
+                        handleEditRoutine(item);
+                      }
 
-                    // Then update only value
-                    setEditRoutine(e.target.value);
+                      // Then update only value
+                      setEditRoutine(e.target.value);
+                    }
                   }}
                   ref={item.id === editId ? inputref : null}
                 />
@@ -235,11 +245,13 @@ const Routine = () => {
                 className="px-4 py-1 text-base md:text-lg cursor-pointer"
                 // disabled={editId !== item.id}
                 onChange={(e) => {
-                  if (editId !== item.id) {
-                    handleEditRoutine(item);
-                  }
+                  if (!editRoutinePending) {
+                    if (editId !== item.id) {
+                      handleEditRoutine(item);
+                    }
 
-                  setEditCategoryId(Number(e.target.value));
+                    setEditCategoryId(Number(e.target.value));
+                  }
                 }}
                 value={editId === item.id ? editCategoryId : item.category}
                 // id="category"
@@ -263,13 +275,16 @@ const Routine = () => {
                   type="checkbox"
                   id={`active_${item.id}`}
                   onChange={(e) => {
-                    if (editId !== item.id) {
-                      handleEditRoutine(item);
-                    }
+                    if (!editRoutinePending) {
+                      if (editId !== item.id) {
+                        handleEditRoutine(item);
+                      }
 
-                    setEditActive(e.target.checked);
+                      setEditActive(e.target.checked);
+                    }
                   }}
                   checked={editId === item.id ? editActive : item.active}
+                  required
                 />
               </div>
 
@@ -288,12 +303,16 @@ const Routine = () => {
                     editId === item.id ? editScheduleAt : item.scheduled_at
                   }
                   onChange={(e) => {
-                    if (editId !== item.id) {
-                      handleEditRoutine(item);
-                    }
+                    if (!editRoutinePending) {
+                      if (editId !== item.id) {
+                        handleEditRoutine(item);
+                      }
 
-                    setEditScheduleAt(e.target.value);
+                      setEditScheduleAt(e.target.value);
+                    }
                   }}
+
+                  required
                 />
               </div>
 
@@ -346,9 +365,20 @@ const Routine = () => {
         </div>
       ) : (
         <div className="my-10 font-semibold text-xl text-gray-500">
-          {categories.length === 0
-            ? "Please add category first"
-            : "No Routines"}
+          {categories.length === 0 ? (
+            <p>
+              You need to a{" "}
+              <Link
+                to="/protected/category"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                add category {" "}
+              </Link>
+              before proceeding!
+            </p>
+          ) : (
+            "No Routines"
+          )}
         </div>
       )}
     </div>

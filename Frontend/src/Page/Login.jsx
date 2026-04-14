@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import loginRightImg from "../assets/loginRightImg.jpg";
+import { LoaderCircle } from "lucide-react";
 
 function Login() {
   const {login } = useAuth();
@@ -10,17 +11,21 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(
     localStorage.getItem("username_or_email") ? true : false
   );
+  const [loginLoading, setLoginLoading] = useState(false)
+  
 
 
   useEffect(() => {
     handleRemeberMe()
   }, [rememberMe])
 
-  function handleFormSubmit(e) {
+  async function handleFormSubmit(e) {
     e.preventDefault();
-    login(username_or_email, password);
+    setLoginLoading(true)
+    await login(username_or_email, password);
     setUsername_or_email("");
     setPassword("");
+    setLoginLoading(false)
   }
 
   function handleRemeberMe(){
@@ -90,9 +95,14 @@ function Login() {
 
             <button
               type="submit"
-              className="bg-gray-600 text-white w-full py-2 mt-10 rounded font-semibold cursor-pointer"
+              className="bg-gray-600 text-white w-full py-2 mt-10 rounded font-semibold cursor-pointer flex justify-center items-center"
+              disabled={loginLoading}
             >
-              Login
+              {loginLoading ? (
+                <LoaderCircle className="animate-spin duration-300 ease-in" />
+              ) : (
+                "Login"
+              )}
             </button>
 
             <div className="mt-5 flex gap-2 justify-center flex-wrap">
