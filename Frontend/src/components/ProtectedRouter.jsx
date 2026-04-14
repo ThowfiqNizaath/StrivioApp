@@ -27,9 +27,9 @@ export const ProtectedRouter = () => {
       <div className="md:hidden absolute top-5 right-5 z-200 p-2 rounded-full bg-white backdrop:blur-2xl cursor-pointer">
         <button onClick={() => setShowMenu((prev) => !prev)}>
           {showMenu ? (
-            <X className="w-8 h-8" />
+            <X className="w-8 h-8 cursor-pointer" />
           ) : (
-            <Menu className="w-6 h-6 md:w-8 md:h-8" />
+            <Menu className="w-6 h-6 md:w-8 md:h-8 cursor-pointer" />
           )}
         </button>
       </div>

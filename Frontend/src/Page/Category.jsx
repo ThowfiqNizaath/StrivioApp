@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import api from "../../Files/axios";
 import { useAuth } from "../context/AuthContext";
-import { Plus, X } from "lucide-react";
+import { LoaderCircle, LoaderIcon, Plus, X } from "lucide-react";
 import { useSnackbar } from "notistack";
 
 const Category = () => {
@@ -12,14 +12,14 @@ const Category = () => {
   const inputref = useRef(null);
   const [addCategory, setAddCategory] = useState(false);
   const {enqueueSnackbar} = useSnackbar()
+  const [addCategoryPending, setAddCategoryPending] = useState(false)
+  const [editCategoryPending, setEditCategoryPending] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
 
-  // console.log(categories);
-  // useEffect(() => {
-  //   console.log(editId, editValue);
-  // }, [editId, editValue]);
 
   async function handleAddCategory(e) {
     e.preventDefault();
+    setAddCategoryPending(true)
     try {
       const response = await api.post("/api/categories/", { name: category });
       setCategories((prev) => [...prev, response.data]);
@@ -29,10 +29,13 @@ const Category = () => {
       setCategory("");
     } catch (err) {
       errorHandlerFn(err);
+    }finally{
+      setAddCategoryPending(false)
     }
   }
 
   async function deleteCategory(id) {
+    setDeleteId(id)
     try {
       const response = await api.delete(`/api/categories/${id}/`);
       if (response.data.success) {
@@ -41,6 +44,8 @@ const Category = () => {
       }
     } catch (err) {
       errorHandlerFn(err);
+    }finally{
+      setDeleteId(null)
     }
   }
 
@@ -51,9 +56,10 @@ const Category = () => {
     setTimeout(() => inputref.current.focus(), 0);
   }
 
-  async function submitCategory(id) {
+  async function submitCategory() {
+    setEditCategoryPending(true)
     try {
-      const response = await api.put(`/api/categories/${id}/`, {
+      const response = await api.put(`/api/categories/${editId}/`, {
         name: editValue,
       });
       setCategories((prev) =>
@@ -64,6 +70,8 @@ const Category = () => {
       setEditValue("");
     } catch (err) {
       errorHandlerFn(err);
+    } finally{
+      setEditCategoryPending(false)
     }
   }
 
@@ -103,8 +111,13 @@ const Category = () => {
             <button
               type="submit"
               className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
+              disabled={addCategoryPending}
             >
-              Add
+              {addCategoryPending ? (
+                <LoaderCircle className="animate-spin duration-300 ease-in" />
+              ) : (
+                "Add"
+              )}
             </button>
             <button
               className="cursor-pointer"
@@ -153,9 +166,12 @@ const Category = () => {
                   <>
                     <button
                       className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
-                      onClick={() => submitCategory(cat.id)}
+                      onClick={submitCategory}
+                      disabled = {editCategoryPending}
                     >
-                      Submit
+                      {
+                        editCategoryPending ? <LoaderCircle className="animate-spin duration-300 ease-in" /> : "Submit"
+                      }
                     </button>
                     <button
                       className="cursor-pointer"
@@ -172,8 +188,11 @@ const Category = () => {
                 <button
                   className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
                   onClick={() => deleteCategory(cat.id)}
+                  disabled = {deleteId === cat.id}
                 >
-                  Delete
+                  {
+                    deleteId === cat.id ? <LoaderCircle className="animate-spin duration-300 ease-in" /> : "Delete"
+                  }
                 </button>
               </div>
             </div>

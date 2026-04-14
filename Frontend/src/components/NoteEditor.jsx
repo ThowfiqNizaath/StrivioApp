@@ -3,7 +3,12 @@ import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import TextAlign from "@tiptap/extension-text-align";
-import { TextAlignCenter, TextAlignEnd, TextAlignStart } from "lucide-react";
+import {
+  LoaderCircle,
+  TextAlignCenter,
+  TextAlignEnd,
+  TextAlignStart,
+} from "lucide-react";
 
 import {
   ArrowLeft,
@@ -16,9 +21,10 @@ import {
   Trash2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const NoteEditor = ({ note, updateNote, deleteNote, debounce }) => {
-  const navigate = useNavigate();
+const NoteEditor = ({ note, updateNote, deleteNote, debounce, deleteId}) => {
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -39,21 +45,28 @@ const NoteEditor = ({ note, updateNote, deleteNote, debounce }) => {
     },
   });
 
-  function getStandardDateTime(arg){
-    const dateTime = new Date(arg)
-    const date = dateTime.toISOString().split("T")[0]
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(deleteId !== note.id);
+    }
+  }, [editor, deleteId, note.id]);
+
+  function getStandardDateTime(arg) {
+    const dateTime = new Date(arg);
+    const date = dateTime.toISOString().split("T")[0];
     const time = dateTime.toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-    })
-   
+    });
+
     return {
-     date,time
-    }
+      date,
+      time,
+    };
   }
 
-  function getBtnClass(active){
+  function getBtnClass(active) {
     return `p-2 rounded transition cursor-pointer ${active ? "bg-gray-800 text-white" : "bg-gray-200 hover:bg-gray-300"}`;
   }
 
@@ -61,7 +74,7 @@ const NoteEditor = ({ note, updateNote, deleteNote, debounce }) => {
   //     console.log(editor);
   //   }, [editor]);
 
-  if (!editor) return null;
+  if (!editor || !note) return null;
 
   return (
     // <div className=""> </div>
@@ -117,23 +130,28 @@ const NoteEditor = ({ note, updateNote, deleteNote, debounce }) => {
         </button>
 
         {/* <div className="flex justify-end flex-1 items-center"> */}
-          <button
-            className={getBtnClass("")}
-            onClick={() => {
-              deleteNote(note.id);
-              navigate("/protected/notes");
-            }}
-          >
+        <button
+          className={getBtnClass("")}
+          onClick={() => {
+            deleteNote(note.id);
+          }}
+          disabled={deleteId === note.id}
+        >
+          {deleteId === note.id ? (
+            <LoaderCircle className="animate-spin duration-300 ease-in" />
+          ) : (
             <Trash2 className="w-6 h-6 md:w-7 md:h-8" />
-          </button>
+          )}
+        </button>
         {/* </div> */}
       </div>
 
       <input
         type="text"
-        className="text-2xl md:text-3xl py-0.5 font-medium outline-0 focus:border-b-gray-200 focus:border-b-2 mt-4 mb-3 w-full px-3 "
+        className={`text-2xl md:text-3xl py-0.5 font-medium outline-0 focus:border-b-gray-200 focus:border-b-2 mt-4 mb-3 w-full px-3 ${deleteId === note.id && "opacity-40 pointer-events-none"}`}
         placeholder="Heading..."
         value={note.title}
+        disabled={note.id === deleteId}
         onChange={(e) => {
           updateNote(note.id, { title: e.target.value });
           debounce(note.id, { title: e.target.value });
@@ -143,7 +161,9 @@ const NoteEditor = ({ note, updateNote, deleteNote, debounce }) => {
       {/* 🔥 Toolbar */}
 
       {/* 📝 Editor */}
-      <div className="flex-1 [&>div]:h-full text-lg md:text-xl px-4">
+      <div
+        className={`flex-1 [&>div]:h-full text-lg md:text-xl px-4 ${deleteId === note.id && "opacity-40 pointer-events-none"}`}
+      >
         <EditorContent editor={editor} />
       </div>
 

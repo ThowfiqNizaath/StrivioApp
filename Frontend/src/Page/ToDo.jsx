@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../Files/axios";
 import { useAuth } from "../context/AuthContext";
-import { ArrowBigRight, Calendar, Check, CircleChevronRight, Save } from "lucide-react";
+import { ArrowBigRight, Calendar, Check, CircleChevronRight, LoaderCircle, Save } from "lucide-react";
 import { useSnackbar } from "notistack";
 
 const ToDo = () => {
@@ -13,69 +13,45 @@ const ToDo = () => {
     getRoutineEntryByFrom,
     errorHandlerFn,
     activeRoutines,
-    setActiveRoutines,
   } = useAuth();
-  // const [activeRoutines, setActiveRoutines] = useState([]);
+ 
   const [editId, setEditId] = useState(null);
   const [editChecked, setEditChecked] = useState(false);
   const [editnote, setEditNote] = useState("");
   const {enqueueSnackbar} = useSnackbar()
+  const [todoLoading, setTodoLoading] = useState(true)
+  const [pending, setPending] = useState(false)
 
   function isValidDate(date) {
     return new Date().toISOString().split("T")[0] >= date;
   }
 
-  // console.log("Todo Loading...")
-  // console.log("routines", routines);
-  // console.log("entries", entries)
-  // console.log("activeRoutines", activeRoutines);
-
   useEffect(() => {
-    // console.log("current UE")
-    // setEntries(routineEntry(currentDate));
-    // console.log(routineEntry(currentDate) || []);
-    // console.log("Curr:", currentDate)
-    // getActiveRoutines();
     currentDateRoutineEntry();
   }, [currentDate]);
-
-  // useEffect(() => {
-  //   console.log("Entries UE", entries);
-  // }, [entries]);
-
-  // useEffect(() => {
-  //   console.log("Valid ", currentDate)
-  // }, [currentDate])
-
-  // useEffect(() => {
-  //   console.log(currentDate);
-  //   console.log(editId || "id null");
-  //   console.log(editChecked || "checked false");
-  //   console.log(editnote || "note empty");
-  // }, [editId, editChecked, editnote]);
 
   async function currentDateRoutineEntry() {
     try {
       if (isValidDate(currentDate)) {
         const response = await getRoutineEntryByFrom(currentDate);
-        setEntries(response);
-        // console.log("Today", " ", currentDate, " ", response);
+        setEntries(await response);
       }
     } catch (err) {
       errorHandlerFn(err);
+    } finally{
+      setTodoLoading(false)
     }
   }
 
   function handleEdit(id, { completed, note }) {
-    // console.log(completed);
     setEditId(id);
     setEditChecked(completed || false);
     setEditNote(note || "");
   }
 
   async function handleSubmit(entryId) {
-    // console.log("Submit", entryId);
     try {
+      setPending(true)
       if (entryId) {
         const response = await api.put(`/api/routineEntry/${entryId}/`, {
           date: currentDate,
@@ -99,6 +75,7 @@ const ToDo = () => {
     } catch (err) {
       errorHandlerFn(err);
     } finally {
+      setPending(false)
       setEditId(null);
       setEditChecked(false);
       setEditNote("");
@@ -106,7 +83,6 @@ const ToDo = () => {
   }
 
   function getRoutineValue(routineId) {
-    // console.log("I'm called by ", routineId)
     return (
       entries?.find(
         (entry) =>
@@ -117,9 +93,7 @@ const ToDo = () => {
 
   return (
     <div className="sm:max-w-110 p-4 sm:px-6 shadow-xl rounded">
-      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">
-        Todo
-      </h2>
+      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Todo</h2>
       {/* Today Rountine Todo */}
       <div>
         <div id="calendar" className="flex items-center gap-2">
@@ -138,76 +112,87 @@ const ToDo = () => {
                 if (isValidDate(e.target.value)) {
                   setCurrentDate(e.target.value);
                 } else {
-                  enqueueSnackbar("Sorry, You can't upload for future.", {variant: "info"});
+                  enqueueSnackbar("Sorry, You can't upload for future.", {
+                    variant: "info",
+                  });
                 }
               }}
             />
           </div>
         </div>
 
-        {
-          activeRoutines.length > 0 ? (<div id="Routine List" className="flex flex-col gap-4 my-10">
-          {activeRoutines.map((item) => {
-            const entry = getRoutineValue(item.id);
+        {activeRoutines.length > 0 && !todoLoading ? (
+          <div id="Routine List" className="flex flex-col gap-4 my-10">
+            {activeRoutines.map((item) => {
+              const entry = getRoutineValue(item.id);
 
-            return (
-              <div key={item.id} className="shadow p-6 flex gap-5">
-                {/* Left */}
-                <div className="flex-1">
-                  <h4 className="text-xl font-semibold mb-2">{item.name}</h4>
+              return (
+                <div key={item.id} className="shadow p-6 flex gap-5">
+                  {/* Left */}
+                  <div className="flex-1">
+                    <h4 className="text-xl font-semibold mb-2">{item.name}</h4>
 
-                  <textarea
-                    className="w-full shadow-xs p-2 cursor-pointer"
-                    value={editId === item.id ? editnote : entry?.note || ""}
-                    placeholder="Note here..."
-                    onChange={(e) => {
-                      if (item.id !== editId) {
-                        handleEdit(item.id, entry);
-                      }
-                      setEditNote(e.target.value);
-                    }}
-                  />
-                </div>
-
-                {/* Right */}
-                <div className="flex flex-col justify-between items-center">
-                  <input
-                    type="checkbox"
-                    className="h-5 w-5 sm:h-6 sm:w-6 cursor-pointer"
-                    onChange={
-                      (e) => {
-                        if (editId !== item.id) {
+                    <textarea
+                      className="w-full shadow-xs p-2 cursor-pointer"
+                      value={editId === item.id ? editnote : entry?.note || ""}
+                      placeholder="Note here..."
+                      onChange={(e) => {
+                        if (item.id !== editId) {
                           handleEdit(item.id, entry);
                         }
-                        setEditChecked(e.target.checked);
-                      }
-                      // handleEdit(item.id, e.target.checked, entry?.note || "")
-                    }
-                    checked={
-                      editId === item.id
-                        ? editChecked
-                        : entry?.completed || false
-                    }
-                  />
+                        setEditNote(e.target.value);
+                      }}
+                    />
+                  </div>
 
-                  {item.id === editId && (
-                    <button
-                    className="cursor-pointer"
-                    title="save"
-                      type="button"
-                      onClick={() => handleSubmit(entry?.id)}
-                    >
-                      <Save className="text-gray-700 h-6 w-6" />
-                    </button>
-                  )}
+                  {/* Right */}
+                  <div className="flex flex-col justify-between items-center">
+                    <input
+                      type="checkbox"
+                      className="h-5 w-5 sm:h-6 sm:w-6 cursor-pointer"
+                      onChange={
+                        (e) => {
+                          if (editId !== item.id) {
+                            handleEdit(item.id, entry);
+                          }
+                          setEditChecked(e.target.checked);
+                        }
+                        // handleEdit(item.id, e.target.checked, entry?.note || "")
+                      }
+                      checked={
+                        editId === item.id
+                          ? editChecked
+                          : entry?.completed || false
+                      }
+                    />
+
+                    {item.id === editId && (
+                      <button
+                        className="cursor-pointer"
+                        title="save"
+                        type="button"
+                        onClick={() => handleSubmit(entry?.id)}
+                        disabled = {pending}
+                      >
+                        {
+                          pending ? <LoaderCircle className="animate-spin duration-300 ease-in"/> : <Save className="text-gray-700 h-6 w-6" />
+                        }
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>) : (<div className="my-10 font-semibold text-xl text-gray-500">
-          Add Routine First
-        </div>)
-        }
+              );
+            })}
+          </div>
+        ) : activeRoutines.length > 0 && todoLoading ? (
+          <div className="h-[20vh] flex justify-center items-center">
+            <LoaderCircle className="animate-spin duration-300 ease-in" />
+          </div>
+        ) : (
+          <div className="my-10 font-semibold text-xl text-gray-500">
+            Add Routine First
+          </div>
+        )}
       </div>
     </div>
   );

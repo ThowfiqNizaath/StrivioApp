@@ -7,13 +7,16 @@ import DOMPurify from "dompurify";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { useState } from "react";
 
 const NotePad = () => {
   const { notes, setNotes, errorHandlerFn } = useAuth();
   const navigate = useNavigate();
   const {enqueueSnackbar}  = useSnackbar()
+  const [addNotePending, setAddNotePending] = useState(false)
 
   async function addNote() {
+    setAddNotePending(true)
     try {
       const response = await api.post("/api/notes/", {
         title: "",
@@ -24,33 +27,12 @@ const NotePad = () => {
       enqueueSnackbar("Note added successfully", {variant:"success"})
     } catch (err) {
       errorHandlerFn(err);
+    } finally{
+      setAddNotePending(false)
     }
   }
 
-  // const debounceSaved = useMemo(() => {
-  //    return debounce(async(id, newdata) => {
-  //     const response = await api.patch(`/api/notes/${id}/`, {...newdata})
-  //     console.log(response.data)
-  //     setNotes((prev) =>
-  //       prev.map((note) => (note.id === id ? response.data : note)),
-  //     );
-  //   }, 3000)
-  // }, [])
 
-  // function updateNote(id, newData) {
-  //   setNotes((prev) =>
-  //     prev.map((note) => (note.id === id ? { ...note, ...newData } : note)),
-  //   );
-  // }
-
-  // async function deleteNote(id) {
-  //   try {
-  //     await api.delete(`/api/notes/${id}/`);
-  //     setNotes((prev) => prev.filter((note) => note.id !== id));
-  //   } catch (err) {
-  //     errorHandlerFn(err);
-  //   }
-  // }
 
   return (
     <div className="min-h-full relative">
@@ -62,6 +44,7 @@ const NotePad = () => {
         type="button"
         className="fixed bottom-5 right-5 z-100 p-2 rounded-full bg-white backdrop:blur-2xl cursor-pointer"
         onClick={addNote}
+        disabled = {addNotePending}
       >
         <Plus className=" w-8 h-8 lg:w-12 lg:h-12" />
       </button>

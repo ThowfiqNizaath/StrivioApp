@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../../Files/axios";
-import { Plus, X } from "lucide-react";
+import { LoaderCircle, Plus, X } from "lucide-react";
 import { useSnackbar } from "notistack";
 
 const Routine = () => {
@@ -16,6 +16,9 @@ const Routine = () => {
   const inputref = useRef(null);
   const [editActive, setEditActive] = useState(true);
   const [addRoutine, setAddRoutine] = useState(false);
+  const [addRoutinePending, setAddRoutinePending] = useState(false)
+  const [editRoutinePending, setEditRoutinePending] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
   const {enqueueSnackbar} = useSnackbar()
 
   // console.log(categories);
@@ -29,6 +32,7 @@ const Routine = () => {
 
   async function handleAddRoutine(e) {
     e.preventDefault();
+    setAddRoutinePending(true)
     try {
       const response = await api.post("/api/routine/", {
         category: categoryId,
@@ -44,16 +48,21 @@ const Routine = () => {
       setScheduledAt("00:00:00");
     } catch (err) {
       errorHandlerFn(err);
+    } finally{
+      setAddRoutinePending(false)
     }
   }
 
   async function deleteRotine(id) {
+    setDeleteId(id)
     try {
       const response = await api.delete(`/api/routine/${id}/`);
       enqueueSnackbar("Routine deleted successfully", { variant: "success" });
       setRoutines((prev) => prev.filter((val) => val.id !== id));
     } catch (err) {
       errorHandlerFn(err);
+    } finally{
+      setDeleteId(null)
     }
   }
 
@@ -70,6 +79,7 @@ const Routine = () => {
   }
 
   async function handleSubmit() {
+    setEditRoutinePending(true)
     try {
       const response = await api.put(`/api/routine/${editId}/`, {
         category: editCategoryId,
@@ -90,6 +100,8 @@ const Routine = () => {
       setEditScheduleAt("00:00");
     } catch (err) {
       errorHandlerFn(err);
+    }finally{
+      setEditRoutinePending(false)
     }
   }
 
@@ -167,8 +179,13 @@ const Routine = () => {
             <button
               type="submit"
               className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
+              disabled={addRoutinePending}
             >
-              Add
+              {addRoutinePending ? (
+                <LoaderCircle className="animate-spin duration-300 ease-in" />
+              ) : (
+                "Add"
+              )}
             </button>
 
             <button
@@ -287,8 +304,13 @@ const Routine = () => {
                       type="button"
                       onClick={handleSubmit}
                       className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
+                      disabled={editRoutinePending}
                     >
-                      Submit
+                      {editRoutinePending && editId === item.id ? (
+                        <LoaderCircle className="animate-spin duration-300 ease-in" />
+                      ) : (
+                        "Submit"
+                      )}
                     </button>
 
                     <button
@@ -310,8 +332,13 @@ const Routine = () => {
                 <button
                   onClick={() => deleteRotine(item.id)}
                   className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
+                  disabled={deleteId === item.id}
                 >
-                  Delete
+                  {deleteId === item.id ? (
+                    <LoaderCircle className="animate-spin duration-300 ease-in" />
+                  ) : (
+                    "Delete"
+                  )}
                 </button>
               </div>
             </div>
