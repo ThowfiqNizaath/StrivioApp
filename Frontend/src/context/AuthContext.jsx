@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
         getCategories();
         getRoutines();
         getNotes();
-        setTimeout(() => setLoading(false), 500);
+        setLoading(false)
       }
     }
 
@@ -54,11 +54,11 @@ export const AuthProvider = ({ children }) => {
       if (response.data.success) {
         setUser(response.data);
         navigate("/protected/dashboard");
-        // setLoading(false);
+        setLoading(false);
       }
     } catch (err) {
       errorHandlerFn(err);
-      setLoading(false);
+      // setLoading(false);
     }
   }
 
@@ -158,7 +158,7 @@ export const AuthProvider = ({ children }) => {
 
   async function errorHandlerFn(err) {
     // console.log(err.response)
-    if (err.response && err.response.status === 401 && user) {
+    if (err.response && err.response.status === 401) {
       try {
         // console.log("I'm refreshing Token");
         const response = await api.post("/register/token/refresh/", {});
@@ -166,14 +166,11 @@ export const AuthProvider = ({ children }) => {
           await authUser();
         }
       } catch (err) {
-        navigate("/login");
+        // navigate("/login");
         setUser(null);
         setLoading(false);
       }
-    } else if (err.response && err.response.status === 401 && !user) {
-      navigate("/login");
-      setLoading(false);
-    } else {
+    }else {
       if (err.response) {
         console.log(err.response);
         const errorMsg =
@@ -221,6 +218,7 @@ export const AuthProvider = ({ children }) => {
         activeRoutines,
         setActiveRoutines,
         setRoutines,
+        getActiveRoutines,
         notes,
         setNotes,
         getRoutineEntryByFrom,

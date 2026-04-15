@@ -2,10 +2,6 @@ import React, { useEffect, useState } from "react";
 import api from "../../Files/axios";
 import { useAuth } from "../context/AuthContext";
 import {
-  ArrowBigRight,
-  Calendar,
-  Check,
-  CircleChevronRight,
   LoaderCircle,
   Save,
 } from "lucide-react";
@@ -17,7 +13,11 @@ const ToDo = () => {
     new Date().toISOString().split("T")[0],
   );
   const [entries, setEntries] = useState([]);
-  const { getRoutineEntryByFrom, errorHandlerFn, activeRoutines } = useAuth();
+  const {
+    getRoutineEntryByFrom,
+    errorHandlerFn,
+    activeRoutines,
+  } = useAuth();
 
   const [editId, setEditId] = useState(null);
   const [editChecked, setEditChecked] = useState(false);
@@ -33,6 +33,7 @@ const ToDo = () => {
   useEffect(() => {
     currentDateRoutineEntry();
   }, [currentDate]);
+
 
   async function currentDateRoutineEntry() {
     try {
@@ -76,6 +77,7 @@ const ToDo = () => {
           completed: editChecked,
           note: editnote,
         });
+        enqueueSnackbar("Task updated successfully", { variant: "success" });
         setEntries((prev) => [...prev, response.data]);
       }
     } catch (err) {

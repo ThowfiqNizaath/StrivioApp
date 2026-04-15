@@ -6,15 +6,19 @@ import { X } from "lucide-react";
 import { Menu } from "lucide-react";
 
 export const ProtectedRouter = () => {
-  const { user, authUser, showMenu, setShowMenu, loading} = useAuth();
+  const { user, authUser, showMenu, setShowMenu, loading } = useAuth();
 
-  // if (!user && !loading) {
-  //   return <Navigate to="/login" />;
-  // }
+  if (loading && !user) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <div className="w-10 h-10 border-6 border-gray-600 border-b-white animate-spin rounded-full"></div>
+      </div>
+    );
+  }
 
-  // if(loading){
-  //   return <div>loading...</div>
-  // }
+  if (!loading && !user) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <div className="flex h-screen relative">
@@ -35,13 +39,7 @@ export const ProtectedRouter = () => {
       </div>
 
       <div className="flex-1 p-4 pt-20 overflow-x-hidden h-full relative">
-        {loading ? (
-          <div className="h-full flex justify-center items-center">
-            <div className="w-10 h-10 border-6 border-gray-600 border-b-white animate-spin rounded-full"></div>
-          </div>
-        ) : (
-          <Outlet />
-        )}
+        <Outlet />
       </div>
     </div>
   );
