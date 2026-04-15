@@ -58,7 +58,6 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       errorHandlerFn(err);
-      // setLoading(false);
     }
   }
 
@@ -69,10 +68,11 @@ export const AuthProvider = ({ children }) => {
         password: password,
       });
       if (response.data.success) {
-        console.log(response.data);
+        // console.log(response.data);
         enqueueSnackbar("Logged in successfully", { variant: "success" });
-        await authUser();
-        return response.data
+        setUser(response.data);
+        navigate("/protected/dashboard");
+        setLoading(false);
       } else {
         enqueueSnackbar(response.data.message, { variant: "error" });
       }
