@@ -7,11 +7,11 @@ const Gauge = ({data}) => {
   const percentage = data?.completedPercentage || 0;
 
   return (
-    <div className="w-full max-w-80 sm:max-w-90 md:max-w-90 lg:max-w-95 xl:max-w-100 p-2">
+    <div className="w-full max-w-80 sm:max-w-90 p-2">
+      {/* md:max-w-90 lg:max-w-95 xl:max-w-100 */}
       <h3 className="text-xl md:text-2xl font-semibold text-center mb-10">
         Today's Progress
       </h3>
-
       <GaugeComponent
         value={percentage}
         type="radial"
@@ -39,7 +39,6 @@ const Gauge = ({data}) => {
           width: 10,
         }}
       />
-
       {/* Extra Info */}
       <div className="mt-10 flex flex-col gap-2 p-2">
         <div className="flex justify-between gap-5 p-2 shadow-xs">

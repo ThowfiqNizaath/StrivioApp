@@ -32,6 +32,7 @@ const NotePad = () => {
     }
   }
 
+  const hasRealText = (html) => html?.replace(/<[^>]*>/g, "").trim() !== "";
 
 
   return (
@@ -67,7 +68,7 @@ const NotePad = () => {
                 </h2>
               )}
 
-              {note?.content ? (
+              {hasRealText(note?.content) ? (
                 <div
                   className="my-4 max-h-50 truncate text-sm sm:text-base"
                   dangerouslySetInnerHTML={{

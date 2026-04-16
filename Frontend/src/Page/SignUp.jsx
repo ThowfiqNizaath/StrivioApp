@@ -22,12 +22,6 @@ const SignUp = () => {
     doubleCheckPassword();
   }, [confirmPassword]);
 
-  // useEffect(() => {
-  //     console.log(name)
-  //     console.log(email)
-  //     console.log(password)
-  //     console.log(confirmPassword)
-  // }, [name, email, password, confirmPassword])
 
   function doubleCheckPassword() {
     if (confirmPassword === password && confirmPassword) {

@@ -22,7 +22,6 @@ const MonthlyStats = () => {
          if (monthStartDate && monthEndDate) {
            setMonthlyEntries(
             await getRoutineEntryByFromTo(monthStartDate, monthEndDate),
-            // await getRoutineEntryByFromTo(monthStartDate, "2026-04-30"),
            );
          } 
        }
@@ -34,14 +33,7 @@ const MonthlyStats = () => {
       () => setData(fillRemainingDates(getMonthlyData(monthlyEntries))),
       [monthlyEntries],
     );
-  
-    // useEffect(() => console.log(currentMonthYear), [currentMonthYear])
 
-    // useEffect(() => console.log(data), [data])
-    // useEffect(() => console.log(monthlyEntries), [monthlyEntries])
-
-
-    // useEffect(() => console.log(currentMonthYear), [currentMonthYear]);
 
 
     function getCurrentMonthRange(){
@@ -61,11 +53,6 @@ const MonthlyStats = () => {
         function formateDate(date){
             return date.toLocaleDateString("en-CA");
         }
-
-        // console.log(currentMonthYear.toLocaleDateString("en-CA"));
-        // console.log(startDate.toLocaleDateString("en-CA"))
-        // console.log(formateDate(startDate));
-        // console.log(formateDate(endDate));
         setMonthStartDate(formateDate(startDate));
         setMonthEndDate(formateDate(endDate));
     }
@@ -155,7 +142,7 @@ const MonthlyStats = () => {
       <div className="w-full flex justify-end mb-8">
         <div className="flex flex-row gap-5 items-center">
           <button
-            className="opacity-40 active:opacity-100"
+            className="opacity-40 active:opacity-100 cursor-pointer"
             onClick={() =>
               setCurrentMonthYear((prev) =>
                 prev.getMonth() === 0
@@ -171,7 +158,7 @@ const MonthlyStats = () => {
             <p>{currentMonthYear?.getFullYear()}</p>
           </div>
           <button
-            className="opacity-40 active:opacity-100"
+            className="opacity-40 active:opacity-100 cursor-pointer"
             onClick={() =>
               setCurrentMonthYear((prev) =>
                 prev.getMonth() === 11
@@ -220,34 +207,6 @@ const MonthlyStats = () => {
               />
             </LineChart>
           </ResponsiveContainer>
-        {/* </div> */}
-      {/* )} */}
-
-      {/* <ResponsiveContainer minWidth="100%" minHeight="100%" width="100%" height="100%" className="border">
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="date"
-            interval={1}
-            type="category"
-            label={{ value: "Date", position: "insideBottom", offset: -5 }}
-          />
-          <YAxis
-            domain={[0, activeRoutines.length + 1]}
-            label={{ value: "Completed", angle: -90, position: "insideLeft" }}
-          />
-          <Tooltip />
-          <Line
-            type="monotone"
-            dataKey="completed"
-            stroke="#4caf50"
-            strokeWidth={2}
-            dot={{ r: 3 }}
-            activeDot={{ r: 6 }}
-            connectNulls={false}
-          />
-        </LineChart>
-      </ResponsiveContainer> */}
     </>
   );
 }

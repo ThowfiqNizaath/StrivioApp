@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import api from "../../Files/axios";
 import { useAuth } from "../context/AuthContext";
-import {
-  LoaderCircle,
-  Save,
-} from "lucide-react";
+import { Calendar, LoaderCircle, Save } from "lucide-react";
 import { useSnackbar } from "notistack";
 import { Link } from "react-router-dom";
 
@@ -13,11 +10,7 @@ const ToDo = () => {
     new Date().toISOString().split("T")[0],
   );
   const [entries, setEntries] = useState([]);
-  const {
-    getRoutineEntryByFrom,
-    errorHandlerFn,
-    activeRoutines,
-  } = useAuth();
+  const { getRoutineEntryByFrom, errorHandlerFn, activeRoutines } = useAuth();
 
   const [editId, setEditId] = useState(null);
   const [editChecked, setEditChecked] = useState(false);
@@ -25,6 +18,8 @@ const ToDo = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [todoLoading, setTodoLoading] = useState(true);
   const [pending, setPending] = useState(false);
+
+  const dateRef = useRef();
 
   function isValidDate(date) {
     return new Date().toISOString().split("T")[0] >= date;
@@ -34,8 +29,8 @@ const ToDo = () => {
     currentDateRoutineEntry();
   }, [currentDate]);
 
-
   async function currentDateRoutineEntry() {
+    setTodoLoading(true)
     try {
       if (isValidDate(currentDate)) {
         const response = await getRoutineEntryByFrom(currentDate);
@@ -105,9 +100,24 @@ const ToDo = () => {
       {/* Today Rountine Todo */}
       <div>
         <div id="calendar" className="flex items-center gap-2">
-          <div className="my-2 flex items-center gap-2 text-xl font-semibold">
+          <div className="my-2 flex items-center gap-4 text-xl font-semibold">
             <p className="">Date:</p>
-            <p className="font-medium">{currentDate}</p>
+             <input
+              ref={dateRef}
+              type="date"
+              value={currentDate}
+              onChange={(e) => {
+                if (isValidDate(e.target.value)) {
+                  setCurrentDate(e.target.value);
+                } else {
+                  enqueueSnackbar("Sorry, You can't upload for future.", {
+                    variant: "info",
+                  });
+                }
+              }}
+              className="outline-none"  
+            />
+            {/* <p className="font-medium">{currentDate}</p> */}
           </div>
 
           {/* <div>
@@ -117,9 +127,8 @@ const ToDo = () => {
             />
           </div> */}
 
-          <div className="flex justify-center items-center">
-            {/* <Calendar className="w-full h-full cursor-pointer -z-10" /> */}
-            <input
+          {/* <div className="w-8 h-8 relative"> */}
+            {/* <input
               id="d"
               className="relative w-6 h-6 text-transparent bg-white cursor-pointer overflow-hidden"
               type="date"
@@ -133,8 +142,13 @@ const ToDo = () => {
                   });
                 }
               }}
-            />
-          </div>
+            /> */}
+
+{/*            
+            <div>
+            <Calendar className="flex items-center justify-center bg-white rounded shadow pointer-events-none" />
+            </div>
+          </div> */}
         </div>
 
         {activeRoutines.length > 0 && !todoLoading ? (

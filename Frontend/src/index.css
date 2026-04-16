@@ -33,7 +33,7 @@ ul[data-type="taskList"] li{
   gap: 8px;
 }
 
-#d::-webkit-calendar-picker-indicator {
+/* #d::-webkit-calendar-picker-indicator {
   position: absolute;
   top: 0; 
   left: 0;
@@ -41,9 +41,9 @@ ul[data-type="taskList"] li{
   height: 100%;
   opacity: 1;
   cursor: pointer;
-} 
+}  */
 
-#d::-webkit-inner-spin-button,
+/* #d::-webkit-inner-spin-button,
 #d::-webkit-clear-button {
   display: none;
-}
+} */

@@ -4,6 +4,7 @@ import Gauge from '../components/Gauge'
 import { UpcomingRoutine } from '../components/UpcomingRoutine'
 import { WeeklyStats } from '../components/WeeklyStats'
 import MonthlyStats from '../components/MonthlyStats'
+import ParticularRoutineStats from '../components/ParticularRoutineStats'
 
 const Dashboard = () => {
 
@@ -86,10 +87,15 @@ const Dashboard = () => {
       </div>
 
       {/* Today Progress Chart */}
-      <div className="flex flex-col mt-20 gap-12 xl:gap-20 lg:flex-row items-center lg:items-start">
+      <div className="flex flex-col mt-20 gap-12 xl:gap-20 lg:flex-row items-center lg:items-center">
         <Gauge data={progressChart} />
-        <div className="w-full lg:flex-1 py-2 px-4 sm:py-4 sm:px-6 rounded shadow">
-          <UpcomingRoutine />
+        <div className="flex w-full lg:w-1/2 flex-1 flex-col gap-8">
+          <div className="flex-1 py-2 px-4 sm:py-4 sm:px-6 rounded shadow">
+            <UpcomingRoutine />
+          </div>
+          <div className="flex-1 py-2 px-4 sm:py-4 sm:px-6 rounded shadow my-5">
+            <ParticularRoutineStats />
+          </div>
         </div>
       </div>
 

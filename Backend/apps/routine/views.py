@@ -4,6 +4,9 @@ from .models import Routine, RoutineEntry
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
 
 class RoutineViewset(ModelViewSet):
@@ -47,4 +50,28 @@ class RoutineEntryViewset(ModelViewSet):
         if routine.category.user != self.request.user:
             raise PermissionDenied("Invalid Routine")
         serializer.save()
+        
+
+class RoutineEntryByRoutineIdView(APIView):
     
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, routine_id):
+        
+        routine = get_object_or_404(Routine, id = routine_id, category__user = request.user)
+        
+        qureyset = RoutineEntry.objects.filter(routine = routine)
+        
+        fromDate = request.query_params.get("fromDate")
+        toDate = request.query_params.get("toDate")
+        
+        if fromDate and toDate:
+            qureyset = qureyset.filter(date__range = [fromDate, toDate])
+        
+        elif fromDate:
+            qureyset = qureyset.filter(date = fromDate)
+            
+            
+        serializer = RoutineEntrySerializer(qureyset, many = True)
+        
+        return Response(serializer.data)
