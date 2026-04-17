@@ -94,15 +94,24 @@ const ToDo = () => {
     );
   }
 
+
+  const sortedRoutines = activeRoutines.sort((a, b) => {
+    if (a.scheduled_at === "00:00:00") return 1; // move a to end
+    if (b.scheduled_at === "00:00:00") return -1; // move b to end
+
+    return a.scheduled_at.localeCompare(b.scheduled_at);
+  });
+
   return (
-    <div className="sm:max-w-110 p-4 sm:px-6 shadow-xl rounded">
+    // sm:max-w-110 p-4 sm:px-6 shadow-xl rounded
+    <div className="p-4 sm:px-6 shadow-xl rounded">
       <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Todo</h2>
       {/* Today Rountine Todo */}
       <div>
         <div id="calendar" className="flex items-center gap-2">
           <div className="my-2 flex items-center gap-4 text-xl font-semibold">
             <p className="">Date:</p>
-             <input
+            <input
               ref={dateRef}
               type="date"
               value={currentDate}
@@ -115,45 +124,18 @@ const ToDo = () => {
                   });
                 }
               }}
-              className="outline-none"  
+              className="outline-none"
             />
-            {/* <p className="font-medium">{currentDate}</p> */}
           </div>
-
-          {/* <div>
-            <input
-              type="date"
-              id="d"
-            />
-          </div> */}
-
-          {/* <div className="w-8 h-8 relative"> */}
-            {/* <input
-              id="d"
-              className="relative w-6 h-6 text-transparent bg-white cursor-pointer overflow-hidden"
-              type="date"
-              value={currentDate}
-              onChange={(e) => {
-                if (isValidDate(e.target.value)) {
-                  setCurrentDate(e.target.value);
-                } else {
-                  enqueueSnackbar("Sorry, You can't upload for future.", {
-                    variant: "info",
-                  });
-                }
-              }}
-            /> */}
-
-{/*            
-            <div>
-            <Calendar className="flex items-center justify-center bg-white rounded shadow pointer-events-none" />
-            </div>
-          </div> */}
         </div>
 
         {activeRoutines.length > 0 && !todoLoading ? (
-          <div id="Routine List" className="flex flex-col gap-4 my-10">
-            {activeRoutines.map((item) => {
+          // flex flex-col gap-4 my-10
+          <div
+            id="Routine List"
+            className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 gap-4 my-10"
+          >
+            {sortedRoutines.map((item) => {
               const entry = getRoutineValue(item.id);
 
               return (
@@ -163,9 +145,10 @@ const ToDo = () => {
                     <h4 className="text-xl font-semibold mb-2">{item.name}</h4>
 
                     <textarea
-                      className="w-full shadow-xs p-2 cursor-pointer"
+                      className="w-full shadow-xs p-2 cursor-text"
                       value={editId === item.id ? editnote : entry?.note || ""}
                       placeholder="Note here..."
+                      maxLength={150}
                       onChange={(e) => {
                         if (!pending) {
                           if (item.id !== editId) {

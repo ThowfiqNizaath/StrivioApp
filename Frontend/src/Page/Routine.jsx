@@ -21,6 +21,8 @@ const Routine = () => {
   const [editRoutinePending, setEditRoutinePending] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const {enqueueSnackbar} = useSnackbar()
+    const [showConfirm, setShowConfirm] = useState(false)
+    const [selectedId, setSelectedId] = useState(null)
 
   // console.log(categories);
   // console.log(routines);
@@ -109,6 +111,24 @@ const Routine = () => {
       setEditRoutinePending(false)
     }
   }
+
+  const handleDeleteClick = (id) => {
+    setSelectedId(id)
+    setShowConfirm(true)
+  }
+
+  const confirmDelete = () => {
+    deleteRotine(selectedId)
+    setShowConfirm(false)
+  }
+
+
+    const sortedRoutines = routines.sort((a, b) => {
+      if (a.scheduled_at === "00:00:00") return 1; // move a to end
+      if (b.scheduled_at === "00:00:00") return -1; // move b to end
+
+      return a.scheduled_at.localeCompare(b.scheduled_at);
+    });
 
   return (
     <div>
@@ -214,7 +234,7 @@ const Routine = () => {
       {/* List Routine */}
       {categories.length > 0 && routines.length > 0 ? (
         <div className="flex flex-col gap-4 my-10">
-          {routines.map((item, index) => (
+          {sortedRoutines.map((item, index) => (
             <div
               key={item.id}
               className="shadow p-6 flex gap-5 justify-between items-center flex-wrap"
@@ -311,7 +331,6 @@ const Routine = () => {
                       setEditScheduleAt(e.target.value);
                     }
                   }}
-
                   required
                 />
               </div>
@@ -349,7 +368,7 @@ const Routine = () => {
                 )}
 
                 <button
-                  onClick={() => deleteRotine(item.id)}
+                  onClick={() => handleDeleteClick(item.id)}
                   className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
                   disabled={deleteId === item.id}
                 >
@@ -372,13 +391,42 @@ const Routine = () => {
                 to="/protected/category"
                 className="text-blue-500 hover:text-blue-700 underline"
               >
-                add category {" "}
+                add category{" "}
               </Link>
               before proceeding!
             </p>
           ) : (
             "No Routines"
           )}
+        </div>
+      )}
+
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 p-4 z-200">
+          <div className="bg-white p-4 rounded shadow">
+            <p className="text-center text-sm sm:text-base font-medium">
+              Are you sure you want to delete? You can't get back!
+            </p>
+
+            <div className="flex gap-3 mt-3 justify-center text-sm sm:text-base">
+              <button
+                onClick={confirmDelete}
+                className="bg-red-500 text-white px-3 py-1 cursor-pointer"
+              >
+                Yes
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowConfirm(false);
+                  setSelectedId(null);
+                }}
+                className="bg-gray-300 px-3 py-1 cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

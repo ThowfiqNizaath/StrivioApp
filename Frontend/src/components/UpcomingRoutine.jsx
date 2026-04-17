@@ -14,17 +14,24 @@ export const UpcomingRoutine = () => {
 
     function getUpcomingRoutine(){
       const currTime = new Date().toTimeString().slice(0, 8);
+      // console.log(currTime)
       const upComingRoutines = routines
-        .filter((routine) => currTime <= routine.scheduled_at && routine.active)
+        .filter((routine) => currTime <= routine.scheduled_at && routine.active )
         .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))[0];
 
       const response =
         upComingRoutines ||
         routines
-          .filter((routine) => currTime >= routine.scheduled_at)
-          .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))[0] || null
+          .filter(
+            (routine) =>
+              currTime >= routine.scheduled_at &&
+              routine.scheduled_at !== "00:00:00",
+          )
+          .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))[0] ||
+        null;
       setNextRoutine(response);
     }
+
   return (
     <>
       <div className="flex items-center gap-2 mb-6 lg:mb-8">

@@ -11,7 +11,7 @@ const ParticularRoutineStats = () => {
   const [monthEndDate, setMonthEndDate] = useState(null);
   const [data, setData] = useState([]);
   const [currentMonthYear, setCurrentMonthYear] = useState(new Date());
-  const [fetchLoading, setFetchLoading] = useState(false)
+  const [fetchLoading, setFetchLoading] = useState(false);
 
   useEffect(() => {
     if (routines.length > 0) {
@@ -29,11 +29,11 @@ const ParticularRoutineStats = () => {
   //   console.log(JSON.stringify(data, null, 2));
   // }, [data]);
 
-    useEffect(() => {
-      if(currentRoutine){
-        getRoutineEntryByRoutineId();
-      }
-    }, [monthStartDate, monthEndDate, currentRoutine])
+  useEffect(() => {
+    if (currentRoutine) {
+      getRoutineEntryByRoutineId();
+    }
+  }, [monthStartDate, monthEndDate, currentRoutine]);
 
   function getCurrentMonthRange() {
     const today = new Date();
@@ -60,27 +60,26 @@ const ParticularRoutineStats = () => {
   }
 
   async function getRoutineEntryByRoutineId() {
-    setFetchLoading(true)
+    setFetchLoading(true);
     try {
       const response = await api.get(
         `/api/routineEntry/by-routine/${currentRoutine}/?fromDate=${monthStartDate}&toDate=${monthEndDate}`,
       );
-      setData(await response.data)
+      setData(await response.data);
     } catch (err) {
       errorHandlerFn(err);
-    } finally{
-      setFetchLoading(false)
+    } finally {
+      setFetchLoading(false);
     }
   }
 
-
-  function getDaysInMonth(){
-    const year = currentMonthYear.getFullYear()
-    const month = currentMonthYear.getMonth()
+  function getDaysInMonth() {
+    const year = currentMonthYear.getFullYear();
+    const month = currentMonthYear.getMonth();
 
     const totalDays = new Date(year, month + 1, 0).getDate();
 
-    return Array.from({length: totalDays}, (_, index) => index + 1)
+    return Array.from({ length: totalDays }, (_, index) => index + 1);
   }
 
   const entryMap = data.reduce((acc, item) => {
@@ -90,7 +89,6 @@ const ParticularRoutineStats = () => {
     };
     return acc;
   }, {});
-
 
   return (
     <div className="">
@@ -175,14 +173,27 @@ const ParticularRoutineStats = () => {
             return (
               <div
                 key={day}
-                title={note || ""} // 👈 hover tooltip
-                className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-sm rounded
-          ${isCompleted ? "bg-green-500" : "border border-gray-400"}
+                // title={note || ""} // 👈 hover tooltip
+                className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-sm rounded relative group
+          ${isCompleted ? "bg-green-500 text-white font-medium" : "border border-gray-400"}
           ${note ? "cursor-pointer" : "cursor-default"}
           ${today.toISOString().split("T")[0] < dateStr && "bg-gray-300 text-gray-500 border-gray-100"}
         `}
               >
                 {day}
+
+                {note && (
+                  <div
+                    className="absolute bottom-10 left-1/2 -translate-x-1/2 
+                opacity-0 translate-y-2 
+                group-hover:opacity-100 group-hover:translate-y-0
+                transition-all duration-300 ease-out
+                bg-gray-600 text-white text-xs px-2 py-1 
+                rounded shadow whitespace-nowrap z-50"
+                  >
+                    {note}
+                  </div>
+                )}
               </div>
             );
           })}

@@ -15,6 +15,8 @@ const Category = () => {
   const [addCategoryPending, setAddCategoryPending] = useState(false)
   const [editCategoryPending, setEditCategoryPending] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [selectedId, setSelectedId] = useState(null)
 
 
   async function handleAddCategory(e) {
@@ -80,6 +82,16 @@ const Category = () => {
     } finally{
       setEditCategoryPending(false)
     }
+  }
+
+  const handleDeleteClick = (id) => {
+    setSelectedId(id)
+    setShowConfirm(true)
+  }
+
+  const confirmDelete = () => {
+    deleteCategory(selectedId)
+    setShowConfirm(false)
   }
 
   return (
@@ -153,7 +165,7 @@ const Category = () => {
                 className="outline-0 focus:border-b-2 focus:border-b-gray-400 cursor-pointer"
                 value={editId === cat.id ? editValue : cat.name}
                 onChange={(e) => {
-                  if(!editCategoryPending){
+                  if (!editCategoryPending) {
                     if (cat.id !== editId) {
                       editCategory(cat);
                     }
@@ -165,17 +177,18 @@ const Category = () => {
                 required
               />
               <div className="flex gap-4 sm:gap-6 items-center flex-wrap">
-
                 {editId === cat.id && (
                   <>
                     <button
                       className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
                       onClick={submitCategory}
-                      disabled = {editCategoryPending}
+                      disabled={editCategoryPending}
                     >
-                      {
-                        editCategoryPending ? <LoaderCircle className="animate-spin duration-300 ease-in" /> : "Submit"
-                      }
+                      {editCategoryPending ? (
+                        <LoaderCircle className="animate-spin duration-300 ease-in" />
+                      ) : (
+                        "Submit"
+                      )}
                     </button>
                     <button
                       className="cursor-pointer"
@@ -191,16 +204,47 @@ const Category = () => {
 
                 <button
                   className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
-                  onClick={() => deleteCategory(cat.id)}
-                  disabled = {deleteId === cat.id}
+                  onClick={() => handleDeleteClick(cat.id)}
+                  disabled={deleteId === cat.id}
                 >
-                  {
-                    deleteId === cat.id ? <LoaderCircle className="animate-spin duration-300 ease-in" /> : "Delete"
-                  }
+                  {deleteId === cat.id ? (
+                    <LoaderCircle className="animate-spin duration-300 ease-in" />
+                  ) : (
+                    "Delete"
+                  )}
                 </button>
               </div>
             </div>
           ))}
+
+          {showConfirm && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 p-4 z-200">
+              <div className="bg-white p-4 rounded shadow">
+                <p className="text-center text-sm sm:text-base font-medium">
+                  Are you sure you want to delete? You can't get back!
+                </p>
+
+                <div className="flex gap-3 mt-3 justify-center text-sm sm:text-base">
+                  <button
+                    onClick={confirmDelete}
+                    className="bg-red-500 text-white px-3 py-1 cursor-pointer"
+                  >
+                    Yes
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowConfirm(false);
+                      setSelectedId(null);
+                    }}
+                    className="bg-gray-300 px-3 py-1 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="my-10 font-semibold text-xl text-gray-500">

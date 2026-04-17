@@ -8,6 +8,21 @@ import { Menu } from "lucide-react";
 export const ProtectedRouter = () => {
   const { user, authUser, showMenu, setShowMenu, loading } = useAuth();
 
+  let deferredPrompt;
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  const installApp = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    }
+  };
+
   if (loading && !user) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -28,7 +43,13 @@ export const ProtectedRouter = () => {
         <Asidebar />
       </div>
 
-      <div className="md:hidden absolute top-5 right-5 z-200 p-2 rounded-full bg-white backdrop:blur-2xl cursor-pointer">
+      <div className="md:hidden absolute top-5 right-5 z-200 rounded-full backdrop-blur-2xl cursor-pointer flex items-center gap-2">
+        <button
+          className="px-2 py-1 border border-gray-400 rounded-2xl cursor-pointer"
+          onClick={installApp}
+        >
+          Get App
+        </button>
         <button onClick={() => setShowMenu((prev) => !prev)}>
           {showMenu ? (
             <X className="w-8 h-8 cursor-pointer" />
