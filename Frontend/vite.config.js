@@ -11,6 +11,17 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico"],
+      workbox: {
+        runtimeCaching: [
+          {
+            urlPattern: /\/api\/.*/,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+            },
+          },
+        ],
+      },
       manifest: {
         name: "Strivio",
         short_name: "Strivio",
@@ -19,27 +30,16 @@ export default defineConfig({
         background_color: "#14B8A6",
         display: "standalone",
         start_url: "/",
-        workbox: {
-          runtimeCaching: [
-            {
-              urlPattern: /\/api\/.*/,
-              handler: "NetworkFirst",
-              options: {
-                cacheName: "api-cache",
-              },
-            },
-          ],
-        },
         icons: [
           {
-            src: "/loginRightImg.jpg",
+            src: "/loginRightImg-192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/loginRightImg.jpg",
+            src: "/loginRightImg-512.png",
             sizes: "512x512",
-            type: "image/png",
+            etype: "image/png",
           },
         ],
       },
