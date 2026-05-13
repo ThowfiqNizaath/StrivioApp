@@ -27,10 +27,10 @@ const Dashboard = () => {
   useEffect(() => {
     async function getTodayRoutine(){
       const response = await getRoutineEntryByFrom(
-        new Date().toISOString().split("T")[0]
+        new Date().toLocaleDateString("en-CA")
       );
       // console.log(response)
-      setTodayEntries(await response)
+      setTodayEntries(response)
     } 
 
     getTodayRoutine()

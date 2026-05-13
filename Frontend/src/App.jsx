@@ -11,6 +11,7 @@ import NotePad from "./Page/NotePad";
 import { Notebook } from "lucide-react";
 import NotePadId from "./components/NotePadId";
 import NotFound from "./Page/NotFound";
+import UserGuide from "./Page/UserGuide";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="todo" element={<ToDo />} />
           <Route path="notes" element={<NotePad />} />
           <Route path="notes/:id" element={<NotePadId />} />
+          <Route path="userGuide" element = {<UserGuide />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="*" element={<NotFound />} />

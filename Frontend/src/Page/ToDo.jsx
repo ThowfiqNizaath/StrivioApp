@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 const ToDo = () => {
   const [currentDate, setCurrentDate] = useState(
-    new Date().toISOString().split("T")[0],
+    new Date().toLocaleDateString("en-CA")
   );
   const [entries, setEntries] = useState([]);
   const { getRoutineEntryByFrom, errorHandlerFn, activeRoutines } = useAuth();
@@ -22,7 +22,7 @@ const ToDo = () => {
   const dateRef = useRef();
 
   function isValidDate(date) {
-    return new Date().toISOString().split("T")[0] >= date;
+    return new Date().toLocaleDateString("en-CA") >= date;
   }
 
   useEffect(() => {

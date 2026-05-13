@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   function isValidDate(date) {
-    return new Date().toISOString().split("T")[0] >= date;
+    return new Date().toLocaleDateString("en-CA") >= date;
   }
 
   async function getRoutineEntryByFrom(date) {

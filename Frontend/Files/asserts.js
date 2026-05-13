@@ -1,10 +1,11 @@
 export const asideNav = [
   { name: "Dashboard", url: "/protected/dashboard" },
-  { name: "To-Do", url: "/protected/todo"},
+  { name: "To-Do", url: "/protected/todo" },
   { name: "Routine", url: "/protected/routine" },
   { name: "Category", url: "/protected/category" },
   { name: "Notes", url: "/protected/notes" },
   { name: "Streaks", url: "/protected/NotFound" },
+  { name: "User Guide", url: "/protected/userGuide" },
 ];
 
 export const months = [
