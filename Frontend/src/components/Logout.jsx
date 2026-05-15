@@ -19,7 +19,7 @@ export const Logout = () => {
     // </button>
     <button
       type="submit"
-      className="border w-full p-2 rounded-sm bg-red-500 text-md font-semibold active:bg-red-700 cursor-pointer flex justify-center items-center"
+      className="border w-full p-2 rounded-sm bg-red-500 text-md font-semibold active:bg-red-700 text-white cursor-pointer flex justify-center items-center"
       disabled={logoutLoading}
       onClick={handelLogout}
     >

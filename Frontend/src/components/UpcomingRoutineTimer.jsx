@@ -36,9 +36,9 @@ const UpcomingRoutineTimer = ({targetTime}) => {
    }, [targetTime]);
 
    return (
-     <div className="flex justify-between my-4 text-xl font-semibold text-gray-600">
-       <h4 className="">Starts In</h4>
-       <p>{timeLeft || "00:00:00"}</p>
+     <div className="flex flex-col gap-2 upcoming-card shadow">
+       <h4 className="upcoming-text">Starts In</h4>
+       <p className='upcoming-count'>{timeLeft || "00:00:00"}</p>
      </div>
    );
 }

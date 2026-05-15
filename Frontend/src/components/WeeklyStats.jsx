@@ -77,26 +77,26 @@ export const WeeklyStats = () => {
   }
 
   return (
-    <>
-      <h3 className="text-xl md:text-2xl font-semibold text-center mb-10">
+    <div className="md:w-[80%] w-full  mx-auto">
+      <h3 className="text-xl md:text-2xl page-header text-center mb-10">
         Weekly Progress
       </h3>
       <ResponsiveContainer width="100%" height={400}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="day" interval={0} angle={-30} textAnchor="end"/>
-          <YAxis domain={[0, activeRoutines.length ]} />
+          <XAxis dataKey="day" interval={0} angle={-30} textAnchor="end" />
+          <YAxis domain={[0, activeRoutines.length]} />
           <Tooltip />
           <Bar dataKey="completed" radius={[5, 5, 0, 0]}>
             {data?.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={entry.completed === 0 ? "#ccc" : "#4CAF50"}
+                fill={entry.completed === 0 ? "#ccc" : "#5932ea"}
               />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-    </>
+    </div>
   );
 };

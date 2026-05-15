@@ -7,9 +7,9 @@ const Gauge = ({data}) => {
   const percentage = data?.completedPercentage || 0;
 
   return (
-    <div className="w-full max-w-80 sm:max-w-90 p-2">
+    <div className="w-full max-w-80 sm:max-w-90 p-2 mx-auto">
       {/* md:max-w-90 lg:max-w-95 xl:max-w-100 */}
-      <h3 className="text-xl md:text-2xl font-semibold text-center mb-10">
+      <h3 className="text-xl md:text-2xl text-center mb-10 page-header">
         Today's Progress
       </h3>
       <GaugeComponent

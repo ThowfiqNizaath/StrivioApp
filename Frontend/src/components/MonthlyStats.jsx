@@ -135,8 +135,8 @@ const MonthlyStats = () => {
     
 
   return (
-    <>
-      <h3 className="text-xl md:text-2xl font-semibold text-center mb-10">
+    <div>
+      <h3 className="text-xl md:text-2xl page-header text-center mb-10">
         Monthly Progress
       </h3>
       <div className="w-full flex justify-end mb-8">
@@ -153,7 +153,7 @@ const MonthlyStats = () => {
           >
             <ChevronLeft />
           </button>
-          <div className="px-8 py-1 sm:px-10 sm:py-2 shadow sm:text-xl flex gap-2 flex-wrap">
+          <div className="px-8 py-1 sm:px-10 sm:py-2 shadow sm:text-xl flex gap-2 flex-wrap select-input">
             <p>{months[currentMonthYear?.getMonth()]}</p>
             <p>{currentMonthYear?.getFullYear()}</p>
           </div>
@@ -173,41 +173,41 @@ const MonthlyStats = () => {
       </div>
 
       {/* {data?.length > 0 && ( */}
-        {/* <div className="w-full h-[350px] border"> */}
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
+      {/* <div className="w-full h-[350px] border"> */}
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
 
-              <XAxis
-                dataKey="date"
-                interval={1}
-                type="category"
-                label={{ value: "Date", position: "insideBottom", offset: -5 }}
-              />
+          <XAxis
+            dataKey="date"
+            interval={1}
+            type="category"
+            label={{ value: "Date", position: "insideBottom", offset: -5 }}
+          />
 
-              <YAxis
-                domain={[0, activeRoutines.length + 1]}
-                label={{
-                  value: "Completed",
-                  angle: -90,
-                  position: "insideLeft",
-                }}
-              />
+          <YAxis
+            domain={[0, activeRoutines.length + 1]}
+            label={{
+              value: "Completed",
+              angle: -90,
+              position: "insideLeft",
+            }}
+          />
 
-              <Tooltip />
+          <Tooltip />
 
-              <Line
-                type="monotone"
-                dataKey="completed"
-                stroke="#4caf50"
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 6 }}
-                connectNulls={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-    </>
+          <Line
+            type="monotone"
+            dataKey="completed"
+            stroke="#5932ea"
+            strokeWidth={2}
+            dot={{ r: 3 }}
+            activeDot={{ r: 6 }}
+            connectNulls={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
 

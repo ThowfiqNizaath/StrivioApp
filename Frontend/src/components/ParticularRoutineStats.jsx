@@ -92,7 +92,7 @@ const ParticularRoutineStats = () => {
 
   return (
     <div className="">
-      <h3 className="text-xl md:text-2xl font-semibold mt-3 mb-8">
+      <h3 className="text-xl md:text-2xl mb-8 page-header">
         Routine Calendar
       </h3>
       {/* Top Routine Picker */}
@@ -101,7 +101,7 @@ const ParticularRoutineStats = () => {
       <select
         id="routinePicker"
         value={currentRoutine}
-        className="px-8 py-1 sm:px-10 sm:py-2 shadow w-full cursor-pointer"
+        className="px-8 py-1 sm:px-10 sm:py-2 select-input w-full cursor-pointer shadow"
         onChange={(e) => {
           setCurrentRoutine(e.target.value);
           // getRoutineEntryByRoutineId();
@@ -175,7 +175,7 @@ const ParticularRoutineStats = () => {
                 key={day}
                 // title={note || ""} // 👈 hover tooltip
                 className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-sm rounded relative group
-          ${isCompleted ? "bg-green-500 text-white font-medium" : "border border-gray-400"}
+          ${isCompleted ? "selected-nav font-medium" : "border border-gray-400"}
           ${note ? "cursor-pointer" : "cursor-default"}
           ${today.toISOString().split("T")[0] < dateStr && "bg-gray-300 text-gray-500 border-gray-100"}
         `}

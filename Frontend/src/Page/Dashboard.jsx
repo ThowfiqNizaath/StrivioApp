@@ -74,36 +74,36 @@ const Dashboard = () => {
   return (
     <div>
       {/* Top Section */}
-      <div className="flex flex-col sm:flex-row flex-wrap gap-10 ">
+      <div className="grid grid-cols-3 card p-4 rounded-2xl">
         {dashboardCards.map((card, index) => (
           <div
             key={index + card.name}
-            className="border p-8 px-12 flex-1 flex justify-between items-center sm:min-w-75 rounded border-gray-200 shadow-sm text-[16px] sm:text-[18px]"
+            className="flex flex-col border-r pl-6 last:border-r-0 border-dashboard"
           >
-            <p className="">{card.name}</p>
-            <p className="">{card.value}</p>
+            <p className="dashboard-header">{card.name}</p>
+            <p className="dashboard-count">{card.value}</p>
           </div>
         ))}
       </div>
 
       {/* Today Progress Chart */}
-      <div className="flex flex-col mt-20 gap-12 xl:gap-20 lg:flex-row items-center lg:items-center">
+      <div className="flex flex-col mt-20 py-8 gap-12 xl:gap-20 lg:flex-row  lg:items-center rounded-2xl card">
         <Gauge data={progressChart} />
-        <div className="flex w-full lg:w-1/2 flex-1 flex-col gap-8">
-          <div className="flex-1 py-2 px-4 sm:py-4 sm:px-6 rounded shadow">
+        <div className="flex w-full lg:w-1/2 flex-1 flex-col gap-8 px-10 py-4">
+          <div className="flex-1 border-b border-[#F0F0F0] pb-12">
             <UpcomingRoutine />
           </div>
-          <div className="flex-1 py-2 px-4 sm:py-4 sm:px-6 rounded shadow my-5">
+          <div className="flex-1 py-2 px-4 sm:py-4 sm:px-6 rounded my-5">
             <ParticularRoutineStats />
           </div>
         </div>
       </div>
 
-      <div className="w-full md:w-[80%] mx-auto mt-25">
+      <div className="card mt-16 rounded-2xl p-8">
         <WeeklyStats />
       </div>
 
-      <div className="w-full md:w-[80%] mx-auto my-25">
+      <div className="card mt-16 rounded-2xl p-8">
         <MonthlyStats />
       </div>
     </div>

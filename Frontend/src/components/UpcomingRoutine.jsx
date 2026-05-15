@@ -36,13 +36,13 @@ export const UpcomingRoutine = () => {
     <>
       <div className="flex items-center gap-2 mb-6 lg:mb-8">
         <div className="bg-green-600 w-3 h-3 rounded-full"></div>
-        <h3 className="text-xl md:text-2xl font-semibold">Upcoming</h3>
+        <h3 className="text-xl md:text-2xl font-semibold page-header">Upcoming</h3>
       </div>
       {nextRoutine?.scheduled_at ? (
-        <div>
-          <div className="flex justify-between my-4 text-xl font-semibold text-gray-600">
-            <h4 className="">{nextRoutine.name}</h4>
-            <p>{convertTimeTo12Hrs(nextRoutine.scheduled_at)}</p>
+        <div className='grid grid-cols-2 gap-2'>
+          <div className="flex flex-col gap-2 upcoming-card shadow">
+            <h4 className="upcoming-text">{nextRoutine.name}</h4>
+            <p className='upcoming-count'>{convertTimeTo12Hrs(nextRoutine.scheduled_at)}</p>
           </div>
 
           <UpcomingRoutineTimer targetTime={nextRoutine?.scheduled_at}/>

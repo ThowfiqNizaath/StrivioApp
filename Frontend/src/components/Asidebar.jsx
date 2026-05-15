@@ -83,7 +83,7 @@ export const Asidebar = () => {
             key={index}
             to={nav.url}
             className={(e) =>
-              `p-2 px-4 ${e.isActive ? "bg-white text-black rounded-sm" : ""}`
+              `p-2 px-4 ${e.isActive ? "selected-nav rounded-sm" : ""}`
             }
             onClick={() => setShowMenu(false)}
           >
@@ -104,7 +104,7 @@ export const Asidebar = () => {
         <Logout />
       </div>
 
-      {showInstall && (
+      {/* {showInstall && (
         <div className="bg-black/50 fixed inset-0 z-200 flex justify-center items-center text-black">
           <div className="bg-white p-4 rounded m-4">
             <p className="font-medium text-md sm:text-xl">
@@ -126,7 +126,7 @@ export const Asidebar = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

@@ -237,7 +237,7 @@ const Routine = () => {
           {sortedRoutines.map((item, index) => (
             <div
               key={item.id}
-              className="shadow p-6 flex gap-5 justify-between items-center flex-wrap"
+              className=" p-6 flex gap-5 justify-between items-center flex-wrap card rounded-2xl"
             >
               <div className="flex items-center gap-6 flex-wrap">
                 <h5>{index + 1}</h5>
@@ -262,7 +262,7 @@ const Routine = () => {
               </div>
 
               <select
-                className="px-4 py-1 text-base md:text-lg cursor-pointer"
+                className="px-4 py-1 text-base md:text-lg cursor-pointer border-b border-[#F0F0F0]"
                 // disabled={editId !== item.id}
                 onChange={(e) => {
                   if (!editRoutinePending) {

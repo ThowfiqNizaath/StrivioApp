@@ -104,8 +104,8 @@ const ToDo = () => {
 
   return (
     // sm:max-w-110 p-4 sm:px-6 shadow-xl rounded
-    <div className="p-4 sm:px-6 shadow-xl rounded">
-      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Todo</h2>
+    <div className="p-4 sm:px-6 shadow-xl card rounded-2xl">
+      <h2 className="text-xl sm:text-2xl lg:text-3xl page-header">Todo</h2>
       {/* Today Rountine Todo */}
       <div>
         <div id="calendar" className="flex items-center gap-2">
@@ -124,7 +124,7 @@ const ToDo = () => {
                   });
                 }
               }}
-              className="outline-none"
+              className="outline-none cursor-pointer"
             />
           </div>
         </div>
@@ -133,72 +133,88 @@ const ToDo = () => {
           // flex flex-col gap-4 my-10
           <div
             id="Routine List"
-            className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 gap-4 my-10"
+            // className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 gap-4 my-10"
+            className="my-10"
           >
-            {sortedRoutines.map((item) => {
-              const entry = getRoutineValue(item.id);
+            <table className=" w-full border-collapse">
+              <thead className="table-header">
+                <tr className="border-b border-[#EEEEEE]">
+                  <th className="pb-2">Routine</th>
+                  <th className="pb-2">Notes</th>
+                  <th className="pb-2">Completed</th>
+                </tr>
+              </thead>
+              <tbody className="">
+                {sortedRoutines.map((item) => {
+                  const entry = getRoutineValue(item.id);
 
-              return (
-                <div key={item.id} className="shadow p-6 flex gap-5">
-                  {/* Left */}
-                  <div className="flex-1">
-                    <h4 className="text-xl font-semibold mb-2">{item.name}</h4>
-
-                    <textarea
-                      className="w-full shadow-xs p-2 cursor-text"
-                      value={editId === item.id ? editnote : entry?.note || ""}
-                      placeholder="Note here..."
-                      maxLength={150}
-                      onChange={(e) => {
-                        if (!pending) {
-                          if (item.id !== editId) {
-                            handleEdit(item.id, entry);
+                  return (
+                    <tr key={item.id} className="border-b border-[#EEEEEE]">
+                      {/* Left */}
+                      <td className="pt-2">
+                        {item.name}
+                        {/* <h4 className="text-xl font-semibold mb-2"></h4> */}
+                      </td>
+                      <td className="pt-2">
+                        <textarea
+                          className="w-full shadow-xs p-2 cursor-text h-10"
+                          value={
+                            editId === item.id ? editnote : entry?.note || ""
                           }
-                          setEditNote(e.target.value);
-                        }
-                      }}
-                    />
-                  </div>
+                          placeholder="Note here..."
+                          maxLength={150}
+                          onChange={(e) => {
+                            if (!pending) {
+                              if (item.id !== editId) {
+                                handleEdit(item.id, entry);
+                              }
+                              setEditNote(e.target.value);
+                            }
+                          }}
+                        />
+                      </td>
 
-                  {/* Right */}
-                  <div className="flex flex-col justify-between items-center">
-                    <input
-                      type="checkbox"
-                      className="h-5 w-5 sm:h-6 sm:w-6 cursor-pointer"
-                      onChange={(e) => {
-                        if (!pending) {
-                          if (editId !== item.id) {
-                            handleEdit(item.id, entry);
+                      <td className="pt-2 flex flex-row justify-center gap-4 h-full mt-4">
+                        <input
+                          type="checkbox"
+                          className="h-5 w-5 sm:h-6 sm:w-6 cursor-pointer accent-[#5932ea]"
+                          onChange={(e) => {
+                            if (!pending) {
+                              if (editId !== item.id) {
+                                handleEdit(item.id, entry);
+                              }
+                              setEditChecked(e.target.checked);
+                            }
+                          }}
+                          checked={
+                            editId === item.id
+                              ? editChecked
+                              : entry?.completed || false
                           }
-                          setEditChecked(e.target.checked);
-                        }
-                      }}
-                      checked={
-                        editId === item.id
-                          ? editChecked
-                          : entry?.completed || false
-                      }
-                    />
-
-                    {item.id === editId && (
-                      <button
-                        className="cursor-pointer"
-                        title="save"
-                        type="button"
-                        onClick={() => handleSubmit(entry?.id)}
-                        disabled={pending}
-                      >
-                        {pending ? (
-                          <LoaderCircle className="animate-spin duration-300 ease-in" />
-                        ) : (
-                          <Save className="text-gray-700 h-6 w-6" />
+                        />
+                        {/* <div className=""> */}
+                        {item.id === editId && (
+                          <button
+                            className="cursor-pointer"
+                            title="save"
+                            type="button"
+                            onClick={() => handleSubmit(entry?.id)}
+                            disabled={pending}
+                          >
+                            {pending ? (
+                              <LoaderCircle className="animate-spin duration-300 ease-in" />
+                            ) : (
+                              <Save className="text-gray-700 h-6 w-6" />
+                            )}
+                          </button>
                         )}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                        {/* </div> */}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         ) : activeRoutines.length > 0 && todoLoading ? (
           <div className="h-[20vh] flex justify-center items-center">

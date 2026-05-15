@@ -36,9 +36,9 @@ export const ProtectedRouter = () => {
   }
 
   return (
-    <div className="flex h-screen relative">
+    <div className="flex h-screen relative bg-background">
       <div
-        className={`${showMenu ? "  max-md:left-0 max-sm:w-[80%] sm:w-[50%]" : "max-md:-left-100"} max-md:absolute md:w-54 lg:w-64 bg-gray-800 text-white px-2  transform transition-all duration-500 max-md:top-0 max-md:bottom-0 max-md:z-200`}
+        className={`${showMenu ? "  max-md:left-0 max-sm:w-[80%] sm:w-[50%]" : "max-md:-left-100"} max-md:absolute md:w-54 lg:w-64 px-2  transform transition-all duration-500 max-md:top-0 max-md:bottom-0 max-md:z-200 bg-navbar text-lightgray`}
       >
         <Asidebar />
       </div>
