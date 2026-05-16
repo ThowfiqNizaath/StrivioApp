@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../../Files/axios";
-import { LoaderCircle, Plus, X } from "lucide-react";
+import { LoaderCircle, Plus, Save, Trash2, X } from "lucide-react";
 import { useSnackbar } from "notistack";
 import { Link } from "react-router-dom";
 
@@ -17,12 +17,12 @@ const Routine = () => {
   const inputref = useRef(null);
   const [editActive, setEditActive] = useState(true);
   const [addRoutine, setAddRoutine] = useState(false);
-  const [addRoutinePending, setAddRoutinePending] = useState(false)
-  const [editRoutinePending, setEditRoutinePending] = useState(false)
-  const [deleteId, setDeleteId] = useState(null)
-  const {enqueueSnackbar} = useSnackbar()
-    const [showConfirm, setShowConfirm] = useState(false)
-    const [selectedId, setSelectedId] = useState(null)
+  const [addRoutinePending, setAddRoutinePending] = useState(false);
+  const [editRoutinePending, setEditRoutinePending] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   // console.log(categories);
   // console.log(routines);
@@ -35,7 +35,7 @@ const Routine = () => {
 
   async function handleAddRoutine(e) {
     e.preventDefault();
-    setAddRoutinePending(true)
+    setAddRoutinePending(true);
     try {
       const response = await api.post("/api/routine/", {
         category: categoryId,
@@ -43,7 +43,7 @@ const Routine = () => {
         scheduled_at: scheduledAt,
       });
       // console.log(response.data)
-      enqueueSnackbar("Routine added successfully", {variant: "success"});
+      enqueueSnackbar("Routine added successfully", { variant: "success" });
       setRoutines((prev) => [...prev, response.data]);
       setAddRoutine(false);
       setRoutine("");
@@ -51,13 +51,13 @@ const Routine = () => {
       setScheduledAt("00:00:00");
     } catch (err) {
       errorHandlerFn(err);
-    } finally{
-      setAddRoutinePending(false)
+    } finally {
+      setAddRoutinePending(false);
     }
   }
 
   async function deleteRotine(id) {
-    if (deleteId === null){
+    if (deleteId === null) {
       setDeleteId(id);
       try {
         const response = await api.delete(`/api/routine/${id}/`);
@@ -72,7 +72,7 @@ const Routine = () => {
   }
 
   function handleEditRoutine({ id, category, name, active, scheduled_at }) {
-    if(!editRoutinePending){
+    if (!editRoutinePending) {
       setEditId(id);
       setEditCategoryId(category);
       setEditRoutine(name);
@@ -86,7 +86,7 @@ const Routine = () => {
   }
 
   async function handleSubmit() {
-    setEditRoutinePending(true)
+    setEditRoutinePending(true);
     try {
       const response = await api.put(`/api/routine/${editId}/`, {
         category: editCategoryId,
@@ -107,34 +107,33 @@ const Routine = () => {
       setEditScheduleAt("00:00");
     } catch (err) {
       errorHandlerFn(err);
-    }finally{
-      setEditRoutinePending(false)
+    } finally {
+      setEditRoutinePending(false);
     }
   }
 
   const handleDeleteClick = (id) => {
-    setSelectedId(id)
-    setShowConfirm(true)
-  }
+    setSelectedId(id);
+    setShowConfirm(true);
+  };
 
   const confirmDelete = () => {
-    deleteRotine(selectedId)
-    setShowConfirm(false)
-  }
+    deleteRotine(selectedId);
+    setShowConfirm(false);
+  };
 
+  const sortedRoutines = routines.sort((a, b) => {
+    if (a.scheduled_at === "00:00:00") return 1; // move a to end
+    if (b.scheduled_at === "00:00:00") return -1; // move b to end
 
-    const sortedRoutines = routines.sort((a, b) => {
-      if (a.scheduled_at === "00:00:00") return 1; // move a to end
-      if (b.scheduled_at === "00:00:00") return -1; // move b to end
-
-      return a.scheduled_at.localeCompare(b.scheduled_at);
-    });
+    return a.scheduled_at.localeCompare(b.scheduled_at);
+  });
 
   return (
-    <div>
+    <div className="card px-4 py-8 rounded-2xl">
       {/* Top Heading */}
       <div className="flex items-center gap-4 text-xl sm:text-2xl font-bold lg:text-3xl">
-        <h2 className="">Routine</h2>
+        <h2 className="page-header">Routine</h2>
 
         {!addRoutine && categories.length > 0 && (
           <button
@@ -233,155 +232,182 @@ const Routine = () => {
 
       {/* List Routine */}
       {categories.length > 0 && routines.length > 0 ? (
-        <div className="flex flex-col gap-4 my-10">
-          {sortedRoutines.map((item, index) => (
-            <div
-              key={item.id}
-              className=" p-6 flex gap-5 justify-between items-center flex-wrap card rounded-2xl"
-            >
-              <div className="flex items-center gap-6 flex-wrap">
-                <h5>{index + 1}</h5>
-                <input
-                  className="outline-0 focus:border-b-gray-400 focus:border-b-2 p-1 cursor-pointer"
-                  value={editId === item.id ? editRoutine : item.name}
-                  required
-                  // disabled={editId !== item.id}
-                  onChange={(e) => {
-                    if (!editRoutinePending) {
-                      if (editId !== item.id) {
-                        // First interaction → start editing this item
-                        handleEditRoutine(item);
+        <table className="mt-10 w-full border-separate border-spacing-x-2">
+          <thead>
+            <tr>
+              <th className="table-header">Routine</th>
+              <th className="table-header">Category</th>
+              <th className="table-header px-3">Active</th>
+              <th className="table-header">Scheduled_at</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {sortedRoutines.map((item, index) => (
+              <tr>
+                <td className="pt-6">
+                  {" "}
+                  <input
+                    className="outline-0 focus:border-b-gray-400 focus:border-b-2 cursor-pointer"
+                    value={editId === item.id ? editRoutine : item.name}
+                    required
+                    // disabled={editId !== item.id}
+                    onChange={(e) => {
+                      if (!editRoutinePending) {
+                        if (editId !== item.id) {
+                          // First interaction → start editing this item
+                          handleEditRoutine(item);
+                        }
+
+                        // Then update only value
+                        setEditRoutine(e.target.value);
                       }
+                    }}
+                    ref={item.id === editId ? inputref : null}
+                  />
+                </td>
 
-                      // Then update only value
-                      setEditRoutine(e.target.value);
-                    }
-                  }}
-                  ref={item.id === editId ? inputref : null}
-                />
-              </div>
+                <td className="pt-6">
+                  <select
+                    className="py-1  cursor-pointer "
+                    // disabled={editId !== item.id}
+                    onChange={(e) => {
+                      if (!editRoutinePending) {
+                        if (editId !== item.id) {
+                          handleEditRoutine(item);
+                        }
 
-              <select
-                className="px-4 py-1 text-base md:text-lg cursor-pointer border-b border-[#F0F0F0]"
-                // disabled={editId !== item.id}
-                onChange={(e) => {
-                  if (!editRoutinePending) {
-                    if (editId !== item.id) {
-                      handleEditRoutine(item);
-                    }
-
-                    setEditCategoryId(Number(e.target.value));
-                  }
-                }}
-                value={editId === item.id ? editCategoryId : item.category}
-                // id="category"
-              >
-                {categories.map((cat, index) => (
-                  <option value={cat.id} key={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-
-              <div className="flex gap-3 items-center">
-                <label
-                  htmlFor={`active_${item.id}`}
-                  className="text-sm md:text-base font-semibold"
-                >
-                  Active:{" "}
-                </label>
-                <input
-                  className="w-4 h-4 cursor-pointer"
-                  type="checkbox"
-                  id={`active_${item.id}`}
-                  onChange={(e) => {
-                    if (!editRoutinePending) {
-                      if (editId !== item.id) {
-                        handleEditRoutine(item);
+                        setEditCategoryId(Number(e.target.value));
                       }
+                    }}
+                    value={editId === item.id ? editCategoryId : item.category}
+                    // id="category"
+                  >
+                    {categories.map((cat, index) => (
+                      <option value={cat.id} key={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </td>
 
-                      setEditActive(e.target.checked);
-                    }
-                  }}
-                  checked={editId === item.id ? editActive : item.active}
-                  required
-                />
-              </div>
+                <td className="pt-6 text-center">
+                  <input
+                    className="w-4 h-4 cursor-pointer accent-[#5932ea]"
+                    type="checkbox"
+                    id={`active_${item.id}`}
+                    onChange={(e) => {
+                      if (!editRoutinePending) {
+                        if (editId !== item.id) {
+                          handleEditRoutine(item);
+                        }
 
-              <div className="flex gap-3 items-center">
-                <label
-                  className="text-sm md:text-base font-semibold"
-                  htmlFor={`scheduled_at_${item.id}`}
-                >
-                  Scheduled_at:
-                </label>
-                <input
-                  className="cursor-pointer"
-                  id={`scheduled_at_${item.id}`}
-                  type="time"
-                  value={
-                    editId === item.id ? editScheduleAt : item.scheduled_at
-                  }
-                  onChange={(e) => {
-                    if (!editRoutinePending) {
-                      if (editId !== item.id) {
-                        handleEditRoutine(item);
+                        setEditActive(e.target.checked);
                       }
-
-                      setEditScheduleAt(e.target.value);
+                    }}
+                    checked={editId === item.id ? editActive : item.active}
+                    required
+                  />
+                </td>
+                <td className="pt-6">
+                  <input
+                    className="cursor-pointer"
+                    id={`scheduled_at_${item.id}`}
+                    type="time"
+                    value={
+                      editId === item.id ? editScheduleAt : item.scheduled_at
                     }
-                  }}
-                  required
-                />
-              </div>
+                    onChange={(e) => {
+                      if (!editRoutinePending) {
+                        if (editId !== item.id) {
+                          handleEditRoutine(item);
+                        }
 
-              <div className="flex gap-4 sm:gap-6 items-center">
-                {editId === item.id && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
-                      disabled={editRoutinePending}
-                    >
-                      {editRoutinePending && editId === item.id ? (
-                        <LoaderCircle className="animate-spin duration-300 ease-in" />
-                      ) : (
-                        "Submit"
-                      )}
-                    </button>
+                        setEditScheduleAt(e.target.value);
+                      }
+                    }}
+                    required
+                  />
+                </td>
+                <td className="flex mt-6 gap-2 flex-wrap items-center justify-center">
+                  <button
+                    onClick={() => handleDeleteClick(item.id)}
+                    className=" rounded font-semibold text-sm md:text-base cursor-pointer"
+                    disabled={deleteId === item.id}
+                  >
+                    {deleteId === item.id ? (
+                      <LoaderCircle className="animate-spin duration-300 ease-in text-[#5932ea]" />
+                    ) : (
+                      // <"Delete">
+                      <Trash2 className="text-red-700" />
+                    )}
+                  </button>
+                  {editId === item.id && (
+                    <div className="flex justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSubmit}
+                        className="rounded font-semibold text-sm md:text-base cursor-pointer"
+                        disabled={editRoutinePending}
+                      >
+                        {editRoutinePending && editId === item.id ? (
+                          <LoaderCircle className="animate-spin duration-300 ease-in" />
+                        ) : (
+                          // "Submit"
+                          <Save className="text-green-700" />
+                        )}
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditId(null);
-                        setEditCategoryId("");
-                        setEditRoutine("");
-                        setEditActive(true);
-                        setEditScheduleAt("00:00");
-                      }}
-                      className="rounded font-semibold text-sm md:text-base cursor-pointer"
-                    >
-                      <X />
-                    </button>
-                  </>
-                )}
-
-                <button
-                  onClick={() => handleDeleteClick(item.id)}
-                  className="border px-4 py-1 rounded font-semibold text-sm md:text-base cursor-pointer"
-                  disabled={deleteId === item.id}
-                >
-                  {deleteId === item.id ? (
-                    <LoaderCircle className="animate-spin duration-300 ease-in" />
-                  ) : (
-                    "Delete"
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditId(null);
+                          setEditCategoryId("");
+                          setEditRoutine("");
+                          setEditActive(true);
+                          setEditScheduleAt("00:00");
+                        }}
+                        className="rounded font-semibold text-sm md:text-base cursor-pointer"
+                      >
+                        <X />
+                      </button>
+                    </div>
                   )}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+                </td>
+                {/* <div
+                key={item.id}
+                className=" p-6 flex gap-5 justify-between items-center flex-wrap card rounded-2xl"
+              > */}
+                {/* <div className="flex items-center gap-6 flex-wrap">
+                  <h5>{index + 1}</h5>
+                 
+                </div> */}
+
+                {/* <div className="flex gap-3 items-center">
+                  <label
+                    htmlFor={`active_${item.id}`}
+                    className="text-sm md:text-base font-semibold"
+                  >
+                    Active:{" "}
+                  </label>
+                </div> */}
+
+                {/* <div className="flex gap-3 items-center">
+                  <label
+                    className="text-sm md:text-base font-semibold"
+                    htmlFor={`scheduled_at_${item.id}`}
+                  >
+                    Scheduled_at:
+                  </label>
+                </div> */}
+
+                <div className="flex gap-4 sm:gap-6 items-center"></div>
+                {/* </div> */}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       ) : (
         <div className="my-10 font-semibold text-xl text-gray-500">
           {categories.length === 0 ? (
